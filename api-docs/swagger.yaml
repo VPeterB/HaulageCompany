@@ -1,0 +1,398 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Haulage Company Administration API"
+  description: "API for managing locations, fleet, shops, and goods"
+basePath: "/api"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /locations:
+    get:
+      summary: "Retrieve all locations"
+      responses:
+        200:
+          description: "Successfully retrieved a list of all locations"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Location"
+            
+    post:
+      summary: "Create a new location"
+      responses:
+        201:
+          description: "Location created successfully"
+      parameters:
+        - name: "location"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Location"
+
+  /locations/{locationId}:
+    get:
+      summary: "Retrieve location by ID"
+      responses:
+        200:
+          description: "Successfully retrieved the location"
+          schema:
+            $ref: "#/definitions/Location"
+      parameters:
+        - name: "locationId"
+          in: "path"
+          required: true
+          type: "integer"
+
+    put:
+      summary: "Update location by ID"
+      responses:
+        200:
+          description: "Location updated successfully"
+      parameters:
+        - name: "locationId"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "location"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Location"
+
+    delete:
+      summary: "Delete location by ID"
+      responses:
+        204:
+          description: "Location deleted successfully"
+      parameters:
+        - name: "locationId"
+          in: "path"
+          required: true
+          type: "integer"
+
+  /fleet:
+    get:
+      summary: "Retrieve all vehicles in the fleet"
+      responses:
+        200:
+          description: "Successfully retrieved a list of all vehicles in the fleet"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Vehicle"
+
+    post:
+      summary: "Add a new vehicle to the fleet"
+      responses:
+        201:
+          description: "Vehicle added to the fleet successfully"
+      parameters:
+        - name: "vehicle"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Vehicle"
+
+  /fleet/{vehicleId}:
+    get:
+      summary: "Retrieve vehicle by ID"
+      responses:
+        200:
+          description: "Successfully retrieved the vehicle"
+          schema:
+            $ref: "#/definitions/Vehicle"
+      parameters:
+        - name: "vehicleId"
+          in: "path"
+          required: true
+          type: "integer"
+
+    put:
+      summary: "Update vehicle by ID"
+      responses:
+        200:
+          description: "Vehicle updated successfully"
+      parameters:
+        - name: "vehicleId"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "vehicle"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Vehicle"
+
+    delete:
+      summary: "Remove vehicle from the fleet by ID"
+      responses:
+        204:
+          description: "Vehicle removed from the fleet successfully"
+      parameters:
+        - name: "vehicleId"
+          in: "path"
+          required: true
+          type: "integer"
+
+  /shops:
+    get:
+      summary: "Retrieve a list of contracted shops"
+      responses:
+        200:
+          description: "Successfully retrieved a list of all contracted shops"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Shop"
+
+    post:
+      summary: "Add a new shop to the list of contracted shops"
+      responses:
+        201:
+          description: "Shop added to the list of contracted shops successfully"
+      parameters:
+        - name: "shop"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Shop"
+
+  /shops/{shopId}:
+    get:
+      summary: "Retrieve contracted shop by ID"
+      responses:
+        200:
+          description: "Successfully retrieved the contracted shop"
+          schema:
+            $ref: "#/definitions/Shop"
+      parameters:
+        - name: "shopId"
+          in: "path"
+          required: true
+          type: "integer"
+
+    put:
+      summary: "Update contracted shop by ID"
+      responses:
+        200:
+          description: "Shop updated successfully"
+      parameters:
+        - name: "shopId"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "shop"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Shop"
+
+    delete:
+      summary: "Terminate contract with a shop by ID"
+      responses:
+        204:
+          description: "Contract with the shop terminated successfully"
+      parameters:
+        - name: "shopId"
+          in: "path"
+          required: true
+          type: "integer"
+
+  /goods:
+    get:
+      summary: "Retrieve a list of available goods"
+      responses:
+        200:
+          description: "Successfully retrieved a list of all available goods"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Good"
+
+    post:
+      summary: "Add new goods to the inventory"
+      responses:
+        201:
+          description: "Goods added to the inventory successfully"
+      parameters:
+        - name: "good"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Good"
+
+# Continue with the rest of your Swagger documentation...
+
+
+  /purchase:
+    post:
+      summary: "Create a new purchase operation"
+      responses:
+        201:
+          description: "Purchase operation created successfully"
+      parameters:
+        - name: "purchaseOperation"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseOperation"
+
+  /transport:
+    post:
+      summary: "Initiate a transport operation"
+      responses:
+        201:
+          description: "Transport operation initiated successfully"
+      parameters:
+        - name: "transportOperation"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/TransportOperation"
+
+  /add-shop:
+    post:
+      summary: "Add a new shop from the mobile application"
+      responses:
+        201:
+          description: "Shop added successfully"
+      parameters:
+        - name: "shop"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Shop"
+
+  /purchase-vehicle:
+    post:
+      summary: "Purchase a new vehicle from the mobile application"
+      responses:
+        201:
+          description: "Vehicle purchased successfully"
+      parameters:
+        - name: "vehicle"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Vehicle"
+
+  /start-transport-operation:
+    post:
+      summary: "Start a transport operation from the mobile application"
+      responses:
+        201:
+          description: "Transport operation started successfully"
+      parameters:
+        - name: "transportOperation"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/TransportOperation"
+
+  /terminate-shop-contract/{shopId}:
+    delete:
+      summary: "Terminate a contract with a shop from the mobile application"
+      responses:
+        204:
+          description: "Shop contract terminated successfully"
+      parameters:
+        - name: "shopId"
+          in: "path"
+          required: true
+          type: "integer"
+
+  /withdraw-vehicle/{vehicleId}:
+    delete:
+      summary: "Withdraw a vehicle from the fleet using the mobile application"
+      responses:
+        204:
+          description: "Vehicle withdrawn successfully"
+      parameters:
+        - name: "vehicleId"
+          in: "path"
+          required: true
+          type: "integer"
+
+definitions:
+  Location:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      address:
+        type: "string"
+
+  Vehicle:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      type:
+        type: "string"
+      licensePlate:
+        type: "string"
+
+  Shop:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      locationId:
+        type: "integer"
+      contact:
+        type: "string"
+
+  Good:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      price:
+        type: "number"
+
+  PurchaseOperation:
+    type: "object"
+    properties:
+      shopId:
+        type: "integer"
+      goods:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            goodId:
+              type: "integer"
+            quantity:
+              type: "integer"
+
+  TransportOperation:
+    type: "object"
+    properties:
+      vehicleId:
+        type: "integer"
+      shopId:
+        type: "integer"
+      goods:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            goodId:
+              type: "integer"
+            quantity:
+              type: "integer"
