@@ -1,62 +1,53 @@
 package hu.bme.aut.haulagecompany.controller;
 
 import hu.bme.aut.haulagecompany.model.Vehicle;
+import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/fleet")
+@RequestMapping("/api/vehicles")
 public class VehicleController {
-    private final VehicleService vehicleService;
-
     @Autowired
-    public VehicleController(VehicleService vehicleService) {
-        this.vehicleService = vehicleService;
+    private VehicleService vehicleService;
+
+    @PostMapping
+    public ResponseEntity<Vehicle> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
+        Vehicle createdVehicle = vehicleService.createVehicle(vehicleDTO);
+        return new ResponseEntity<>(createdVehicle, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Vehicle> getAllVehicles() {
-        List<Vehicle> vehicles = vehicleService.getAllVehicles();
-        return vehicles;
+    public Iterable<Vehicle> getAllVehicles() {
+        return vehicleService.getAllVehicles();
     }
 
-    @PostMapping
-    public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
-        Vehicle createdVehicle = vehicleService.addVehicle(vehicle);
-        return ResponseEntity.status(201).body(createdVehicle);
-    }
-
-    @GetMapping("/{vehicleId}")
-    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long vehicleId) {
-        Vehicle vehicle = vehicleService.getVehicleById(vehicleId);
+    @GetMapping("/{id}")
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
+        Vehicle vehicle = vehicleService.getVehicleById(id);
         if (vehicle != null) {
-            return ResponseEntity.ok(vehicle);
+            return new ResponseEntity<>(vehicle, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{vehicleId}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long vehicleId, @RequestBody Vehicle vehicle) {
-        Vehicle updatedVehicle = vehicleService.updateVehicle(vehicleId, vehicle);
+    @PutMapping("/{id}")
+    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody VehicleDTO vehicleDTO) {
+        Vehicle updatedVehicle = vehicleService.updateVehicle(id, vehicleDTO);
         if (updatedVehicle != null) {
-            return ResponseEntity.ok(updatedVehicle);
+            return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @DeleteMapping("/{vehicleId}")
-    public ResponseEntity<Void> removeVehicle(@PathVariable Long vehicleId) {
-        boolean success = vehicleService.removeVehicle(vehicleId);
-        if (success) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
+        vehicleService.deleteVehicle(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

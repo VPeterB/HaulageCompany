@@ -1,59 +1,50 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Vehicle;
+import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class VehicleService {
-    private final VehicleRepository vehicleRepository;
-
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository) {
-        this.vehicleRepository = vehicleRepository;
+    private VehicleRepository vehicleRepository;
+
+    public Vehicle createVehicle(VehicleDTO vehicleDTO) {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setName(vehicleDTO.getName());
+        vehicle.setType(vehicleDTO.getType());
+        vehicle.setLicensePlate(vehicleDTO.getLicensePlate());
+
+        // You can set additional fields as needed
+
+        return vehicleRepository.save(vehicle);
     }
 
-    public List<Vehicle> getAllVehicles() {
+    public Iterable<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
     public Vehicle getVehicleById(Long id) {
-        Optional<Vehicle> vehicle = vehicleRepository.findById(id);
-        return vehicle.orElse(null);
+        return vehicleRepository.findById(id).orElse(null);
     }
 
-    public Vehicle addVehicle(Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
-    }
+    public Vehicle updateVehicle(Long id, VehicleDTO vehicleDTO) {
+        Vehicle existingVehicle = getVehicleById(id);
+        if (existingVehicle != null) {
+            existingVehicle.setName(vehicleDTO.getName());
+            existingVehicle.setType(vehicleDTO.getType());
+            existingVehicle.setLicensePlate(vehicleDTO.getLicensePlate());
 
-    public Vehicle updateVehicle(Long id, Vehicle updatedVehicle) {
-        Optional<Vehicle> existingVehicle = vehicleRepository.findById(id);
+            // Update additional fields as needed
 
-        if (existingVehicle.isPresent()) {
-            Vehicle vehicle = existingVehicle.get();
-            // Update the fields of the existing vehicle with the values from updatedVehicle
-            vehicle.setName(updatedVehicle.getName());
-            vehicle.setType(updatedVehicle.getType());
-            vehicle.setLicensePlate(updatedVehicle.getLicensePlate());
-
-            return vehicleRepository.save(vehicle);
-        } else {
-            return null;
+            return vehicleRepository.save(existingVehicle);
         }
+        return null;
     }
 
-    public boolean removeVehicle(Long id) {
-        Optional<Vehicle> vehicle = vehicleRepository.findById(id);
-
-        if (vehicle.isPresent()) {
-            vehicleRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+    public void deleteVehicle(Long id) {
+        vehicleRepository.deleteById(id);
     }
 }
