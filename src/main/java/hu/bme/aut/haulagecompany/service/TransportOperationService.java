@@ -3,7 +3,7 @@ package hu.bme.aut.haulagecompany.service;
 import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.TransportedGood;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
-import hu.bme.aut.haulagecompany.model.dto.TransportedGoodDTO;
+import hu.bme.aut.haulagecompany.model.dto.StoredGoodDTO;
 import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ public class TransportOperationService {
         transportOperation.setVehicleId(transportOperationDTO.getVehicleId());
         transportOperation.setShopId(transportOperationDTO.getShopId());
 
-        List<TransportedGoodDTO> transportedGoodsDTO = transportOperationDTO.getGoods();
+        List<StoredGoodDTO> transportedGoodsDTO = transportOperationDTO.getGoods();
         List<TransportedGood> transportedGoods = new ArrayList<>();
-        for (TransportedGoodDTO transportedGoodDTO : transportedGoodsDTO) {
+        for (StoredGoodDTO storedGoodDTO : transportedGoodsDTO) {
             TransportedGood transportedGood = new TransportedGood();
-            transportedGood.setGoodId(transportedGoodDTO.getGoodId());
-            transportedGood.setQuantity(transportedGoodDTO.getQuantity());
+            transportedGood.setGoodId(storedGoodDTO.getGoodId());
+            transportedGood.setQuantity(storedGoodDTO.getQuantity());
             transportedGoods.add(transportedGood);
         }
         transportOperation.setGoods(transportedGoods);
@@ -48,12 +48,12 @@ public class TransportOperationService {
             existingTransportOperation.setVehicleId(transportOperationDTO.getVehicleId());
             existingTransportOperation.setShopId(transportOperationDTO.getShopId());
 
-            List<TransportedGoodDTO> transportedGoodsDTO = transportOperationDTO.getGoods();
+            List<StoredGoodDTO> transportedGoodsDTO = transportOperationDTO.getGoods();
             List<TransportedGood> transportedGoods = new ArrayList<>();
-            for (TransportedGoodDTO transportedGoodDTO : transportedGoodsDTO) {
+            for (StoredGoodDTO storedGoodDTO : transportedGoodsDTO) {
                 TransportedGood transportedGood = new TransportedGood();
-                transportedGood.setGoodId(transportedGoodDTO.getGoodId());
-                transportedGood.setQuantity(transportedGoodDTO.getQuantity());
+                transportedGood.setGoodId(storedGoodDTO.getGoodId());
+                transportedGood.setQuantity(storedGoodDTO.getQuantity());
                 transportedGoods.add(transportedGood);
             }
             existingTransportOperation.setGoods(transportedGoods);

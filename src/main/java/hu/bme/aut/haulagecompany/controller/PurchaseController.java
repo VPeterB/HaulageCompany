@@ -1,7 +1,7 @@
 package hu.bme.aut.haulagecompany.controller;
 
 import hu.bme.aut.haulagecompany.model.Purchase;
-import hu.bme.aut.haulagecompany.model.dto.PurchaseDTO;
+import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,8 +15,8 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
     @PostMapping
-    public ResponseEntity<Purchase> createPurchase(@RequestBody PurchaseDTO purchaseDTO) {
-        Purchase createdPurchase = purchaseService.createPurchase(purchaseDTO);
+    public ResponseEntity<Purchase> createPurchase(@RequestBody OrderDTO orderDTO) {
+        Purchase createdPurchase = purchaseService.createPurchase(orderDTO);
         return new ResponseEntity<>(createdPurchase, HttpStatus.CREATED);
     }
 
@@ -36,8 +36,8 @@ public class PurchaseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Purchase> updatePurchase(@PathVariable Long id, @RequestBody PurchaseDTO purchaseDTO) {
-        Purchase updatedPurchase = purchaseService.updatePurchase(id, purchaseDTO);
+    public ResponseEntity<Purchase> updatePurchase(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
+        Purchase updatedPurchase = purchaseService.updatePurchase(id, orderDTO);
         if (updatedPurchase != null) {
             return new ResponseEntity<>(updatedPurchase, HttpStatus.OK);
         } else {

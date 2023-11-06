@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "goods")
 public class Good {
     @Id
@@ -12,5 +13,6 @@ public class Good {
     private Long id;
     private String name;
     private String description;
-    private Double price;  // You can change the type according to your actual use case
+    private Double size;
+    private Double weight;
 }

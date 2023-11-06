@@ -2,8 +2,8 @@ package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Purchase;
 import hu.bme.aut.haulagecompany.model.PurchasedGood;
-import hu.bme.aut.haulagecompany.model.dto.PurchaseDTO;
-import hu.bme.aut.haulagecompany.model.dto.PurchasedGoodDTO;
+import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
+import hu.bme.aut.haulagecompany.model.dto.OrderedGoodDTO;
 import hu.bme.aut.haulagecompany.repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,16 +16,16 @@ public class PurchaseService {
     @Autowired
     private PurchaseRepository purchaseRepository;
 
-    public Purchase createPurchase(PurchaseDTO purchaseDTO) {
+    public Purchase createPurchase(OrderDTO orderDTO) {
         Purchase purchase = new Purchase();
-        purchase.setShopId(purchaseDTO.getShopId());
+        purchase.setShopId(orderDTO.getShopId());
 
-        List<PurchasedGoodDTO> purchasedGoodsDTO = purchaseDTO.getGoods();
+        List<OrderedGoodDTO> purchasedGoodsDTO = orderDTO.getGoods();
         List<PurchasedGood> purchasedGoods = new ArrayList<>();
-        for (PurchasedGoodDTO purchasedGoodDTO : purchasedGoodsDTO) {
+        for (OrderedGoodDTO orderedGoodDTO : purchasedGoodsDTO) {
             PurchasedGood purchasedGood = new PurchasedGood();
-            purchasedGood.setGoodId(purchasedGoodDTO.getGoodId());
-            purchasedGood.setQuantity(purchasedGoodDTO.getQuantity());
+            purchasedGood.setGoodId(orderedGoodDTO.getGoodId());
+            purchasedGood.setQuantity(orderedGoodDTO.getQuantity());
             purchasedGoods.add(purchasedGood);
         }
         purchase.setGoods(purchasedGoods);
@@ -41,17 +41,17 @@ public class PurchaseService {
         return purchaseRepository.findById(id).orElse(null);
     }
 
-    public Purchase updatePurchase(Long id, PurchaseDTO purchaseDTO) {
+    public Purchase updatePurchase(Long id, OrderDTO orderDTO) {
         Purchase existingPurchase = getPurchaseById(id);
         if (existingPurchase != null) {
-            existingPurchase.setShopId(purchaseDTO.getShopId());
+            existingPurchase.setShopId(orderDTO.getShopId());
 
-            List<PurchasedGoodDTO> purchasedGoodsDTO = purchaseDTO.getGoods();
+            List<OrderedGoodDTO> purchasedGoodsDTO = orderDTO.getGoods();
             List<PurchasedGood> purchasedGoods = new ArrayList<>();
-            for (PurchasedGoodDTO purchasedGoodDTO : purchasedGoodsDTO) {
+            for (OrderedGoodDTO orderedGoodDTO : purchasedGoodsDTO) {
                 PurchasedGood purchasedGood = new PurchasedGood();
-                purchasedGood.setGoodId(purchasedGoodDTO.getGoodId());
-                purchasedGood.setQuantity(purchasedGoodDTO.getQuantity());
+                purchasedGood.setGoodId(orderedGoodDTO.getGoodId());
+                purchasedGood.setQuantity(orderedGoodDTO.getQuantity());
                 purchasedGoods.add(purchasedGood);
             }
             existingPurchase.setGoods(purchasedGoods);

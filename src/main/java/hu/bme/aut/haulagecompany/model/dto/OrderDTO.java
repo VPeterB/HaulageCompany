@@ -6,11 +6,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ShopDTO {
+public class OrderDTO {
     @Nullable
     private Long id;
-    private String name;
-    private String address;
+    private Long shopID;
+    private List<Long> orderedGoodIDs;
     @Nullable
-    private List<Long> orderIDs;
+    private Long transportOperationID;
 }

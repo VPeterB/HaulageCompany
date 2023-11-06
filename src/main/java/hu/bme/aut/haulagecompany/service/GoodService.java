@@ -1,6 +1,7 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Good;
+import hu.bme.aut.haulagecompany.model.StoredGood;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.repository.GoodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class GoodService {
     @Autowired
-    private GoodRepository goodRepository;
+    private GoodRepository<StoredGood> goodRepository;
 
     public Good createGood(GoodDTO goodDTO) {
+
         Good good = new Good();
         good.setName(goodDTO.getName());
         good.setDescription(goodDTO.getDescription());
