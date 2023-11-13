@@ -6,13 +6,15 @@ import hu.bme.aut.haulagecompany.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    public Vehicle createVehicle(VehicleDTO vehicleDTO) {
-        Vehicle vehicle = new Vehicle();
+    public VehicleDTO createVehicle(VehicleDTO vehicleDTO) {
+        VehicleDTO vehicle = new VehicleDTO();
         vehicle.setName(vehicleDTO.getName());
         vehicle.setType(vehicleDTO.getType());
         vehicle.setLicensePlate(vehicleDTO.getLicensePlate());
@@ -22,15 +24,15 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public Iterable<Vehicle> getAllVehicles() {
+    public List<VehicleDTO> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
-    public Vehicle getVehicleById(Long id) {
+    public VehicleDTO getVehicleById(Long id) {
         return vehicleRepository.findById(id).orElse(null);
     }
 
-    public Vehicle updateVehicle(Long id, VehicleDTO vehicleDTO) {
+    public VehicleDTO updateVehicle(Long id, VehicleDTO vehicleDTO) {
         Vehicle existingVehicle = getVehicleById(id);
         if (existingVehicle != null) {
             existingVehicle.setName(vehicleDTO.getName());

@@ -4,7 +4,7 @@ import jakarta.annotation.Nullable;
 import lombok.Data;
 
 @Data
-public class StoredGoodDTO {
+public class GoodDTO {
     @Nullable
     private Long id;
     private String name;
@@ -15,6 +15,4 @@ public class StoredGoodDTO {
     @Nullable
     private Double weight;
     private int quantity;
-    @Nullable
-    private Long lorrySiteID;
 }

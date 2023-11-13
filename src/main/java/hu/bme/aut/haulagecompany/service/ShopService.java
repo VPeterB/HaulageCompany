@@ -6,28 +6,30 @@ import hu.bme.aut.haulagecompany.repository.ShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShopService {
     @Autowired
     private ShopRepository shopRepository;
 
-    public Shop createShop(ShopDTO shopDTO) {
-        Shop shop = new Shop();
+    public ShopDTO createShop(ShopDTO shopDTO) {
+        ShopDTO shop = new ShopDTO();
         shop.setName(shopDTO.getName());
         shop.setLocationId(shopDTO.getLocationId());
         shop.setContact(shopDTO.getContact());
         return shopRepository.save(shop);
     }
 
-    public Iterable<Shop> getAllShops() {
+    public List<ShopDTO> getAllShops() {
         return shopRepository.findAll();
     }
 
-    public Shop getShopById(Long id) {
+    public ShopDTO getShopById(Long id) {
         return shopRepository.findById(id).orElse(null);
     }
 
-    public Shop updateShop(Long id, ShopDTO shopDTO) {
+    public ShopDTO updateShop(Long id, ShopDTO shopDTO) {
         Shop existingShop = getShopById(id);
         if (existingShop != null) {
             existingShop.setName(shopDTO.getName());

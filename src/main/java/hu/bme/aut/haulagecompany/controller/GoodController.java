@@ -1,12 +1,13 @@
 package hu.bme.aut.haulagecompany.controller;
 
-import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.service.GoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/goods")
@@ -15,19 +16,19 @@ public class GoodController {
     private GoodService goodService;
 
     @PostMapping
-    public ResponseEntity<Good> createGood(@RequestBody GoodDTO goodDTO) {
-        Good createdGood = goodService.createGood(goodDTO);
+    public ResponseEntity<GoodDTO> createGood(@RequestBody GoodDTO goodDTO) {
+        GoodDTO createdGood = goodService.createGood(goodDTO);
         return new ResponseEntity<>(createdGood, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Iterable<Good> getAllGoods() {
-        return goodService.getAllGoods();
+    public ResponseEntity<List<GoodDTO>> getAllGoods() {
+        return new ResponseEntity<>(goodService.getAllGoods(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Good> getGoodById(@PathVariable Long id) {
-        Good good = goodService.getGoodById(id);
+    public ResponseEntity<GoodDTO> getGoodById(@PathVariable Long id) {
+        GoodDTO good = goodService.getGoodById(id);
         if (good != null) {
             return new ResponseEntity<>(good, HttpStatus.OK);
         } else {
@@ -36,8 +37,8 @@ public class GoodController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Good> updateGood(@PathVariable Long id, @RequestBody GoodDTO goodDTO) {
-        Good updatedGood = goodService.updateGood(id, goodDTO);
+    public ResponseEntity<GoodDTO> updateGood(@PathVariable Long id, @RequestBody GoodDTO goodDTO) {
+        GoodDTO updatedGood = goodService.updateGood(id, goodDTO);
         if (updatedGood != null) {
             return new ResponseEntity<>(updatedGood, HttpStatus.OK);
         } else {

@@ -16,7 +16,7 @@ public class TransportOperationService {
     @Autowired
     private TransportOperationRepository transportOperationRepository;
 
-    public TransportOperation createTransportOperation(TransportOperationDTO transportOperationDTO) {
+    public TransportOperationDTO createTransportOperation(TransportOperationDTO transportOperationDTO) {
         TransportOperation transportOperation = new TransportOperation();
         transportOperation.setVehicleId(transportOperationDTO.getVehicleId());
         transportOperation.setShopId(transportOperationDTO.getShopId());
@@ -34,15 +34,15 @@ public class TransportOperationService {
         return transportOperationRepository.save(transportOperation);
     }
 
-    public Iterable<TransportOperation> getAllTransportOperations() {
+    public List<TransportOperationDTO> getAllTransportOperations() {
         return transportOperationRepository.findAll();
     }
 
-    public TransportOperation getTransportOperationById(Long id) {
+    public TransportOperationDTO getTransportOperationById(Long id) {
         return transportOperationRepository.findById(id).orElse(null);
     }
 
-    public TransportOperation updateTransportOperation(Long id, TransportOperationDTO transportOperationDTO) {
+    public TransportOperationDTO updateTransportOperation(Long id, TransportOperationDTO transportOperationDTO) {
         TransportOperation existingTransportOperation = getTransportOperationById(id);
         if (existingTransportOperation != null) {
             existingTransportOperation.setVehicleId(transportOperationDTO.getVehicleId());

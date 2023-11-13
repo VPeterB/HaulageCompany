@@ -15,4 +15,5 @@ public class Good {
     private String description;
     private Double size;
     private Double weight;
+    private int quantity;
 }

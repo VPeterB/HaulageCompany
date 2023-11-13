@@ -11,7 +11,7 @@ public class LorrySiteDTO {
     private String name;
     private String address;
     @Nullable
-    private List<Long> storedGoodIDs;
+    private List<Long> goodIDs;
     @Nullable
     private List<Long> vehicleIDs;
 }

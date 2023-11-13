@@ -11,6 +11,6 @@ import java.util.List;
 public class LorrySite extends Location{
     @OneToMany(mappedBy="location")
     private List<Vehicle> vehicles;
-    @OneToMany(mappedBy="location")
-    private List<StoredGood> storedGoods;
+    @OneToMany
+    private List<Good> goods;
 }

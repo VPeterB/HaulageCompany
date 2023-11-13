@@ -15,8 +15,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;
-    @OneToMany(mappedBy="order")
-    private List<OrderedGood> orderedGoods;
+    @OneToMany
+    private List<Good> goods;
     @OneToOne
     private TransportOperation transportOperation;
 }
