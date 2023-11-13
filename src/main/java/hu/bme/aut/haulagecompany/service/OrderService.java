@@ -1,11 +1,8 @@
 package hu.bme.aut.haulagecompany.service;
 
-import hu.bme.aut.haulagecompany.model.Purchase;
-import hu.bme.aut.haulagecompany.model.PurchasedGood;
 import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.repository.OrderRepository;
-import hu.bme.aut.haulagecompany.repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

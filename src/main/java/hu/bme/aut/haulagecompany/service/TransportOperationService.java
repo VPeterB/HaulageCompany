@@ -1,9 +1,7 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.TransportOperation;
-import hu.bme.aut.haulagecompany.model.TransportedGood;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
-import hu.bme.aut.haulagecompany.model.dto.StoredGoodDTO;
 import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
