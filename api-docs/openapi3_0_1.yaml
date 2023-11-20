@@ -1,0 +1,646 @@
+openapi: 3.0.1
+info:
+  title: Haulage Company API
+  description: API for managing goods, locations, purchases, shops, transport operations, and vehicles
+  version: 2.0.0
+servers:
+  - url: /api
+paths:
+  /goods:
+    post:
+      summary: Create a new good
+      operationId: createGood
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoodDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodDTO'
+    get:
+      summary: Get all goods
+      operationId: getAllGoods
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GoodDTO'
+
+  /goods/{id}:
+    get:
+      summary: Get a good by ID
+      operationId: getGoodById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a good by ID
+      operationId: updateGood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoodDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a good by ID
+      operationId: deleteGood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /locations:
+    post:
+      summary: Create a new location
+      operationId: createLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LorrySiteDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LorrySiteDTO'
+    get:
+      summary: Get all locations
+      operationId: getAllLocations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LorrySiteDTO'
+
+  /locations/{id}:
+    get:
+      summary: Get a location by ID
+      operationId: getLocationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LorrySiteDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a location by ID
+      operationId: updateLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LorrySiteDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LorrySiteDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a location by ID
+      operationId: deleteLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /purchases:
+    post:
+      summary: Create a new purchase
+      operationId: createPurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDTO'
+    get:
+      summary: Get all purchases
+      operationId: getAllPurchases
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDTO'
+
+  /purchases/{id}:
+    get:
+      summary: Get a purchase by ID
+      operationId: getPurchaseById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a purchase by ID
+      operationId: updatePurchase
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a purchase by ID
+      operationId: deletePurchase
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /shops:
+    post:
+      summary: Create a new shop
+      operationId: createShop
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShopDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopDTO'
+    get:
+      summary: Get all shops
+      operationId: getAllShops
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShopDTO'
+
+  /shops/{id}:
+    get:
+      summary: Get a shop by ID
+      operationId: getShopById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a shop by ID
+      operationId: updateShop
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShopDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a shop by ID
+      operationId: deleteShop
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /transport-operations:
+    post:
+      summary: Create a new transport operation
+      operationId: createTransportOperation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportOperationDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportOperationDTO'
+    get:
+      summary: Get all transport operations
+      operationId: getAllTransportOperations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransportOperationDTO'
+
+  /transport-operations/{id}:
+    get:
+      summary: Get a transport operation by ID
+      operationId: getTransportOperationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportOperationDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a transport operation by ID
+      operationId: updateTransportOperation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportOperationDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportOperationDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a transport operation by ID
+      operationId: deleteTransportOperation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /vehicles:
+    post:
+      summary: Create a new vehicle
+      operationId: createVehicle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDTO'
+    get:
+      summary: Get all vehicles
+      operationId: getAllVehicles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleDTO'
+
+  /vehicles/{id}:
+    get:
+      summary: Get a vehicle by ID
+      operationId: getVehicleById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDTO'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update a vehicle by ID
+      operationId: updateVehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDTO'
+        '404':
+          description: Not Found
+
+    delete:
+      summary: Delete a vehicle by ID
+      operationId: deleteVehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+components:
+  schemas:
+    GoodDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        size:
+          type: number
+          nullable: true
+        weight:
+          type: number
+          nullable: true
+        quantity:
+          type: integer
+
+    LorrySiteDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        goodIDs:
+          type: array
+          items:
+            type: integer
+          nullable: true
+        vehicleIDs:
+          type: array
+          items:
+            type: integer
+          nullable: true
+
+    OrderDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        shopID:
+          type: integer
+        goodIDs:
+          type: array
+          items:
+            type: integer
+          nullable: true
+        transportOperationID:
+          type: integer
+          nullable: true
+
+    ShopDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        orderIDs:
+          type: array
+          items:
+            type: integer
+          nullable: true
+
+    TransportOperationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date-time
+        usedVehicleIDs:
+          type: array
+          items:
+            type: integer
+        orderID:
+          type: integer
+
+    VehicleDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        licensePlate:
+          type: string
+        size:
+          type: number
+        maxWeight:
+          type: number
+        lorrySiteID:
+          type: integer
+        transportOperationIDs:
+          type: array
+          items:
+            type: integer
+          nullable: true
