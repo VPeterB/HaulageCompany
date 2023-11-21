@@ -28,7 +28,7 @@ public class TransportOperationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TransportOperationDTO> getTransportOperationById(@PathVariable Long id) {
-        TransportOperationDTO transportOperation = transportOperationService.getTransportOperationById(id);
+        TransportOperationDTO transportOperation = transportOperationService.getTransportOperationDTOById(id);
         if (transportOperation != null) {
             return new ResponseEntity<>(transportOperation, HttpStatus.OK);
         } else {

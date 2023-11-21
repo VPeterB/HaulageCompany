@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GoodRepository<T extends Good> extends CrudRepository<T, Long> {
+public interface GoodRepository extends CrudRepository<Good, Long> {
     // Custom queries can be added here if needed
 }

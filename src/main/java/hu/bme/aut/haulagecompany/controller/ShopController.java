@@ -28,7 +28,7 @@ public class ShopController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ShopDTO> getShopById(@PathVariable Long id) {
-        ShopDTO shop = shopService.getShopById(id);
+        ShopDTO shop = shopService.getShopDTOById(id);
         if (shop != null) {
             return new ResponseEntity<>(shop, HttpStatus.OK);
         } else {
