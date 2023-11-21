@@ -22,9 +22,10 @@ public class OrderService {
     public OrderService(
             OrderRepository orderRepository,
             ShopService shopService,
-            GoodService goodService) {
+            GoodService goodService,
+            ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
         this.shopService = shopService;
         this.goodService = goodService;
     }

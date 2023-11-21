@@ -22,9 +22,10 @@ public class TransportOperationService {
     public TransportOperationService(
             TransportOperationRepository transportOperationRepository,
             VehicleService vehicleService,
-            OrderService orderService) {
+            OrderService orderService,
+            ModelMapper modelMapper) {
         this.transportOperationRepository = transportOperationRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
         this.vehicleService = vehicleService;
         this.orderService = orderService;
     }

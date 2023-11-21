@@ -18,6 +18,12 @@ public class VehicleController {
     @PostMapping
     public ResponseEntity<VehicleDTO> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
         VehicleDTO createdVehicle = vehicleService.createVehicle(vehicleDTO);
+        if(createdVehicle == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if(createdVehicle.getId() == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdVehicle, HttpStatus.CREATED);
     }
 

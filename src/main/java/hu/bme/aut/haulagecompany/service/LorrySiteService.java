@@ -1,12 +1,14 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.LorrySite;
+import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.model.dto.LorrySiteDTO;
 import hu.bme.aut.haulagecompany.repository.LorrySiteRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,25 +17,18 @@ import java.util.stream.Collectors;
 public class LorrySiteService {
     private final LorrySiteRepository lorrySiteRepository;
     private final ModelMapper modelMapper;
-    private final GoodService goodService;
-    private final VehicleService vehicleService;
 
     @Autowired
     public LorrySiteService(
-            LorrySiteRepository lorrySiteRepository,
-            GoodService goodService,
-            VehicleService vehicleService) {
+            LorrySiteRepository lorrySiteRepository) {
         this.lorrySiteRepository = lorrySiteRepository;
         this.modelMapper = new ModelMapper();
-        this.goodService = goodService;
-        this.vehicleService = vehicleService;
     }
 
     public LorrySiteDTO createLocation(LorrySiteDTO lorrySiteDTO) {
         LorrySite lorrySite = convertToEntity(lorrySiteDTO);
-        lorrySite.setGoods(goodService.getGoodsByIds(lorrySiteDTO.getGoodIDs()));
-        lorrySite.setVehicles(vehicleService.getVehiclesByIds(lorrySiteDTO.getVehicleIDs()));
-
+        lorrySite.setGoods(new ArrayList<>());
+        lorrySite.setVehicles(new ArrayList<>());
         LorrySite createdLocation = lorrySiteRepository.save(lorrySite);
         return convertToDTO(createdLocation);
     }
@@ -56,8 +51,6 @@ public class LorrySiteService {
         if (existingLocation.isPresent()) {
             LorrySite updatedLocation = convertToEntity(updatedLocationDTO);
             updatedLocation.setId(id);
-            updatedLocation.setGoods(goodService.getGoodsByIds(updatedLocationDTO.getGoodIDs()));
-            updatedLocation.setVehicles(vehicleService.getVehiclesByIds(updatedLocationDTO.getVehicleIDs()));
 
             LorrySite savedLocation = lorrySiteRepository.save(updatedLocation);
             return convertToDTO(savedLocation);
@@ -76,5 +69,20 @@ public class LorrySiteService {
 
     private LorrySite convertToEntity(LorrySiteDTO lorrySiteDTO) {
         return modelMapper.map(lorrySiteDTO, LorrySite.class);
+    }
+
+    public Optional<LorrySite> findById(Long lorrySiteID) {
+        return lorrySiteRepository.findById(lorrySiteID);
+    }
+
+    public void addVehicle(Vehicle createdVehicle) {
+        Optional<LorrySite> edit = lorrySiteRepository.findById(createdVehicle.getLocation().getId());
+        if(edit.isPresent()){
+            LorrySite editable = edit.get();
+            List<Vehicle> vehicleList = editable.getVehicles();
+            vehicleList.add(createdVehicle);
+            editable.setVehicles(vehicleList);
+            lorrySiteRepository.save(edit.get());
+        }
     }
 }

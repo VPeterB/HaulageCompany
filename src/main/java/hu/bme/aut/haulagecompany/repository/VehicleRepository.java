@@ -4,7 +4,10 @@ import hu.bme.aut.haulagecompany.model.Vehicle;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface VehicleRepository extends CrudRepository<Vehicle, Long> {
-    // You can add custom query methods here if needed
+    Optional<Vehicle> findByLicensePlate(String licensePlate);
+
 }

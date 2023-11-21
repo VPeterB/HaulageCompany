@@ -17,9 +17,9 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final ModelMapper modelMapper;
     @Autowired
-    public ShopService(ShopRepository shopRepository) {
+    public ShopService(ShopRepository shopRepository, ModelMapper modelMapper) {
         this.shopRepository = shopRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
     }
 
     public ShopDTO createShop(ShopDTO shopDTO) {

@@ -17,9 +17,9 @@ public class GoodService {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public GoodService(GoodRepository goodRepository) {
+    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper) {
         this.goodRepository = goodRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
     }
 
     public GoodDTO createGood(GoodDTO goodDTO) {

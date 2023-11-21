@@ -14,17 +14,27 @@ import java.util.stream.Collectors;
 @Service
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
+    private final LorrySiteService lorrySiteService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository) {
+    public VehicleService(VehicleRepository vehicleRepository, LorrySiteService lorrySiteService, ModelMapper modelMapper) {
         this.vehicleRepository = vehicleRepository;
-        this.modelMapper = new ModelMapper();
+        this.lorrySiteService = lorrySiteService;
+        this.modelMapper = modelMapper;
     }
 
     public VehicleDTO createVehicle(VehicleDTO vehicleDTO) {
+        if(vehicleRepository.findByLicensePlate(vehicleDTO.getLicensePlate()).isPresent()){
+            return new VehicleDTO();
+        }
         Vehicle vehicle = convertToEntity(vehicleDTO);
+        vehicle.setLocation((lorrySiteService.findById(vehicleDTO.getLorrySiteID())).orElse(null));
+        if(vehicle.getLocation() == null){
+            return null;
+        }
         Vehicle createdVehicle = vehicleRepository.save(vehicle);
+        lorrySiteService.addVehicle(createdVehicle);
         return convertToDTO(createdVehicle);
     }
 
@@ -46,7 +56,8 @@ public class VehicleService {
         if (existingVehicle.isPresent()) {
             Vehicle updatedVehicle = convertToEntity(updatedVehicleDTO);
             updatedVehicle.setId(id);
-
+            updatedVehicle.setLocation(lorrySiteService.findById(updatedVehicleDTO.getLorrySiteID()).orElse(existingVehicle.get().getLocation()));
+            updatedVehicle.setTransportOperations(existingVehicle.get().getTransportOperations());
             Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
             return convertToDTO(savedVehicle);
         } else {
