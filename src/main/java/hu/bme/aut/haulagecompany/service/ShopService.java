@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,18 +16,15 @@ import java.util.stream.Collectors;
 public class ShopService {
     private final ShopRepository shopRepository;
     private final ModelMapper modelMapper;
-    private final OrderService orderService;
-
     @Autowired
-    public ShopService(ShopRepository shopRepository, OrderService orderService) {
+    public ShopService(ShopRepository shopRepository) {
         this.shopRepository = shopRepository;
         this.modelMapper = new ModelMapper();
-        this.orderService = orderService;
     }
 
     public ShopDTO createShop(ShopDTO shopDTO) {
         Shop shop = convertToEntity(shopDTO);
-        shop.setOrders(orderService.getOrdersByIds(shopDTO.getOrderIDs()));
+        shop.setOrders(new ArrayList<>());
 
         Shop createdShop = shopRepository.save(shop);
         return convertToDTO(createdShop);
@@ -55,7 +53,6 @@ public class ShopService {
         if (existingShop.isPresent()) {
             Shop updatedShop = convertToEntity(updatedShopDTO);
             updatedShop.setId(id);
-            updatedShop.setOrders(orderService.getOrdersByIds(updatedShopDTO.getOrderIDs()));
 
             Shop savedShop = shopRepository.save(updatedShop);
             return convertToDTO(savedShop);

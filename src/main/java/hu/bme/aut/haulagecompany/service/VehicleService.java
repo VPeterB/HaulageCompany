@@ -17,9 +17,9 @@ public class VehicleService {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, ModelMapper modelMapper) {
+    public VehicleService(VehicleRepository vehicleRepository) {
         this.vehicleRepository = vehicleRepository;
-        this.modelMapper = modelMapper;
+        this.modelMapper = new ModelMapper();
     }
 
     public VehicleDTO createVehicle(VehicleDTO vehicleDTO) {

@@ -17,14 +17,14 @@ public class GoodService {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper) {
+    public GoodService(GoodRepository goodRepository) {
         this.goodRepository = goodRepository;
-        this.modelMapper = modelMapper;
+        this.modelMapper = new ModelMapper();
     }
 
     public GoodDTO createGood(GoodDTO goodDTO) {
         Good good = convertToEntity(goodDTO);
-        Good createdGood = (Good) goodRepository.save(good);
+        Good createdGood = goodRepository.save(good);
         return convertToDTO(createdGood);
     }
 
@@ -47,7 +47,7 @@ public class GoodService {
             Good updatedGood = convertToEntity(updatedGoodDTO);
             updatedGood.setId(id);
 
-            Good savedGood = (Good) goodRepository.save(updatedGood);
+            Good savedGood = goodRepository.save(updatedGood);
             return convertToDTO(savedGood);
         } else {
             return null;

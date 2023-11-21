@@ -17,26 +17,22 @@ public class OrderService {
     private final ModelMapper modelMapper;
     private final ShopService shopService;
     private final GoodService goodService;
-    private final TransportOperationService transportOperationService;
 
     @Autowired
     public OrderService(
             OrderRepository orderRepository,
             ShopService shopService,
-            GoodService goodService,
-            TransportOperationService transportOperationService) {
+            GoodService goodService) {
         this.orderRepository = orderRepository;
         this.modelMapper = new ModelMapper();
         this.shopService = shopService;
         this.goodService = goodService;
-        this.transportOperationService = transportOperationService;
     }
 
     public OrderDTO createPurchase(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
         order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
-        order.setTransportOperation(transportOperationService.getTransportOperationById(orderDTO.getTransportOperationID()));
 
         Order createdOrder = orderRepository.save(order);
         return convertToDTO(createdOrder);
@@ -62,7 +58,6 @@ public class OrderService {
             updatedOrder.setId(id);
             updatedOrder.setShop(shopService.getShopById(updatedOrderDTO.getShopID()));
             updatedOrder.setGoods(goodService.getGoodsByIds(updatedOrderDTO.getGoodIDs()));
-            updatedOrder.setTransportOperation(transportOperationService.getTransportOperationById(updatedOrderDTO.getTransportOperationID()));
 
             Order savedOrder = orderRepository.save(updatedOrder);
             return convertToDTO(savedOrder);
@@ -81,10 +76,6 @@ public class OrderService {
 
     private Order convertToEntity(OrderDTO orderDTO) {
         return modelMapper.map(orderDTO, Order.class);
-    }
-
-    public List<Order> getOrdersByIds(List<Long> orderIDs) {
-        return (List<Order>) orderRepository.findAllById(orderIDs);
     }
 
     public Order getOrderById(Long orderID) {

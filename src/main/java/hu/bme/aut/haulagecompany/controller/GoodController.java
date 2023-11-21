@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/goods")
@@ -29,7 +30,7 @@ public class GoodController {
     @GetMapping("/{id}")
     public ResponseEntity<GoodDTO> getGoodById(@PathVariable Long id) {
         GoodDTO good = goodService.getGoodById(id);
-        if (good != null) {
+        if (Objects.nonNull(good)) {
             return new ResponseEntity<>(good, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -39,7 +40,7 @@ public class GoodController {
     @PutMapping("/{id}")
     public ResponseEntity<GoodDTO> updateGood(@PathVariable Long id, @RequestBody GoodDTO goodDTO) {
         GoodDTO updatedGood = goodService.updateGood(id, goodDTO);
-        if (updatedGood != null) {
+        if (Objects.nonNull(updatedGood)) {
             return new ResponseEntity<>(updatedGood, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

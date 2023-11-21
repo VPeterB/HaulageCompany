@@ -21,11 +21,10 @@ public class LorrySiteService {
     @Autowired
     public LorrySiteService(
             LorrySiteRepository lorrySiteRepository,
-            ModelMapper modelMapper,
             GoodService goodService,
             VehicleService vehicleService) {
         this.lorrySiteRepository = lorrySiteRepository;
-        this.modelMapper = modelMapper;
+        this.modelMapper = new ModelMapper();
         this.goodService = goodService;
         this.vehicleService = vehicleService;
     }
