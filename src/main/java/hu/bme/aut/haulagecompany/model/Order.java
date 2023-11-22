@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.model;
 
+import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,12 +21,4 @@ public class Order {
     private List<Good> goods;
     @OneToOne
     private TransportOperation transportOperation;
-
-    public List<Long> getGoodIds() {
-        List<Long> ids = new ArrayList<>();
-        for(Good g : this.goods){
-            ids.add(g.getId());
-        }
-        return ids;
-    }
 }

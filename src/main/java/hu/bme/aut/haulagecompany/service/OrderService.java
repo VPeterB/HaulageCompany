@@ -1,6 +1,7 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Order;
+import hu.bme.aut.haulagecompany.model.dto.GetOrderDTO;
 import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.repository.OrderRepository;
 import org.modelmapper.ModelMapper;
@@ -30,28 +31,32 @@ public class OrderService {
         this.goodService = goodService;
     }
 
-    public OrderDTO createOrder(OrderDTO orderDTO) {
+    public GetOrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
         order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
 
         Order createdOrder = orderRepository.save(order);
-        return convertToDTO(createdOrder);
+        return convertToGetDTO(createdOrder);
     }
 
-    public List<OrderDTO> getAllOrders() {
+    private GetOrderDTO convertToGetDTO(Order createdOrder) {
+        return modelMapper.map(createdOrder, GetOrderDTO.class);
+    }
+
+    public List<GetOrderDTO> getAllOrders() {
         List<Order> orders = (List<Order>) orderRepository.findAll();
         return orders.stream()
-                .map(this::convertToDTO)
+                .map(this::convertToGetDTO)
                 .toList();
     }
 
-    public OrderDTO getOrderDTOById(Long id) {
+    public GetOrderDTO getOrderDTOById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
-        return order.map(this::convertToDTO).orElse(null);
+        return order.map(this::convertToGetDTO).orElse(null);
     }
 
-    public OrderDTO updateOrder(Long id, OrderDTO updatedOrderDTO) {
+    public GetOrderDTO updateOrder(Long id, OrderDTO updatedOrderDTO) {
         Optional<Order> existingOrder = orderRepository.findById(id);
 
         if (existingOrder.isPresent()) {
@@ -61,7 +66,7 @@ public class OrderService {
             updatedOrder.setGoods(goodService.getGoodsByIds(updatedOrderDTO.getGoodIDs()));
 
             Order savedOrder = orderRepository.save(updatedOrder);
-            return convertToDTO(savedOrder);
+            return convertToGetDTO(savedOrder);
         } else {
             return null;
         }
@@ -69,10 +74,6 @@ public class OrderService {
 
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
-    }
-
-    private OrderDTO convertToDTO(Order order) {
-        return modelMapper.map(order, OrderDTO.class);
     }
 
     private Order convertToEntity(OrderDTO orderDTO) {
