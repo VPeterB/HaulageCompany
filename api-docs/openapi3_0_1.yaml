@@ -190,11 +190,13 @@ paths:
         '404':
           description: Not Found
 
-  /purchases:
+  /api/orders:
     post:
-      summary: Create a new purchase
-      operationId: createPurchase
+      summary: Create a new order
+      operationId: createOrder
       requestBody:
+        description: Order data
+        required: true
         content:
           application/json:
             schema:
@@ -205,10 +207,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
+
     get:
-      summary: Get all purchases
-      operationId: getAllPurchases
+      summary: Get all orders
+      operationId: getAllOrders
       responses:
         '200':
           description: OK
@@ -217,12 +220,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderDTO'
+                  $ref: '#/components/schemas/GetOrderDTO'
 
-  /purchases/{id}:
+  /api/orders/{id}:
     get:
-      summary: Get a purchase by ID
-      operationId: getPurchaseById
+      summary: Get an order by ID
+      operationId: getOrderById
       parameters:
         - name: id
           in: path
@@ -235,13 +238,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
         '404':
           description: Not Found
 
     put:
-      summary: Update a purchase by ID
-      operationId: updatePurchase
+      summary: Update an order by ID
+      operationId: updateOrder
       parameters:
         - name: id
           in: path
@@ -249,6 +252,8 @@ paths:
           schema:
             type: integer
       requestBody:
+        description: Order data
+        required: true
         content:
           application/json:
             schema:
@@ -259,13 +264,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
         '404':
           description: Not Found
 
     delete:
-      summary: Delete a purchase by ID
-      operationId: deletePurchase
+      summary: Delete an order by ID
+      operationId: deleteOrder
       parameters:
         - name: id
           in: path
@@ -544,6 +549,90 @@ paths:
 
 components:
   schemas:
+    VehicleDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        licensePlate:
+          type: string
+        size:
+          type: number
+        maxWeight:
+          type: number
+        lorrySiteID:
+          type: integer
+        transportOperationDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransportOperationDTO'
+
+    LorrySiteDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        goodDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoodDTO'
+        vehicleDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleDTO'
+
+    TransportOperationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: timestamp
+        usedVehicleIDs:
+          type: array
+          items:
+            type: integer
+        orderID:
+          type: integer
+
+    ShopDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        orderIDs:
+          type: array
+          items:
+            type: integer
+
+    OrderDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        shopID:
+          type: integer
+        goodIDs:
+          type: array
+          items:
+            type: integer
+        transportOperationID:
+          type: integer
+          nullable: true
+
     GoodDTO:
       type: object
       properties:
@@ -564,91 +653,18 @@ components:
         quantity:
           type: integer
 
-    LorrySiteDTO:
+    GetOrderDTO:
       type: object
       properties:
         id:
           type: integer
           nullable: true
-        name:
-          type: string
-        address:
-          type: string
-        goodIDs:
+        shopDTO:
+          $ref: '#/components/schemas/ShopDTO'
+        goodDTOs:
           type: array
           items:
-            type: integer
-          nullable: true
-        vehicleIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-
-    OrderDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        shopID:
-          type: integer
-        goodIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
+            $ref: '#/components/schemas/GoodDTO'
         transportOperationID:
           type: integer
-          nullable: true
-
-    ShopDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        name:
-          type: string
-        address:
-          type: string
-        orderIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-
-    TransportOperationDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-        date:
-          type: string
-          format: date-time
-        usedVehicleIDs:
-          type: array
-          items:
-            type: integer
-        orderID:
-          type: integer
-
-    VehicleDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        licensePlate:
-          type: string
-        size:
-          type: number
-        maxWeight:
-          type: number
-        lorrySiteID:
-          type: integer
-        transportOperationIDs:
-          type: array
-          items:
-            type: integer
           nullable: true

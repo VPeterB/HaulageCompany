@@ -51,4 +51,6 @@ public class LorrySiteController {
         lorrySiteService.deleteLocation(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    //TODO addGoodsToStorage
 }

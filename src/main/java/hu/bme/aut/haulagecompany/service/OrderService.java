@@ -30,7 +30,7 @@ public class OrderService {
         this.goodService = goodService;
     }
 
-    public OrderDTO createPurchase(OrderDTO orderDTO) {
+    public OrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
         order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
@@ -39,19 +39,19 @@ public class OrderService {
         return convertToDTO(createdOrder);
     }
 
-    public List<OrderDTO> getAllPurchases() {
+    public List<OrderDTO> getAllOrders() {
         List<Order> orders = (List<Order>) orderRepository.findAll();
         return orders.stream()
                 .map(this::convertToDTO)
                 .toList();
     }
 
-    public OrderDTO getPurchaseById(Long id) {
+    public OrderDTO getOrderDTOById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
         return order.map(this::convertToDTO).orElse(null);
     }
 
-    public OrderDTO updatePurchase(Long id, OrderDTO updatedOrderDTO) {
+    public OrderDTO updateOrder(Long id, OrderDTO updatedOrderDTO) {
         Optional<Order> existingOrder = orderRepository.findById(id);
 
         if (existingOrder.isPresent()) {
@@ -67,7 +67,7 @@ public class OrderService {
         }
     }
 
-    public void deletePurchase(Long id) {
+    public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
 
