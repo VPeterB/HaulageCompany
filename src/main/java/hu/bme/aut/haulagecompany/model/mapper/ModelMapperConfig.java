@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,20 +50,29 @@ public class ModelMapperConfig {
     }
 
     private List<VehicleDTO> mapVehiclesToVehicleDTOs(List<Vehicle> vehicles, ModelMapper mm) {
-        return vehicles.stream()
-                .map(vehicle -> mm.map(vehicle, VehicleDTO.class))
-                .toList();
+        if(vehicles != null){
+            return vehicles.stream()
+                    .map(vehicle -> mm.map(vehicle, VehicleDTO.class))
+                    .toList();
+        }
+        return new ArrayList<>();
     }
 
     private List<TransportOperationDTO> mapTransportOperationsToTransportOperationDTOs(List<TransportOperation> transportOperations, ModelMapper mm) {
-        return transportOperations.stream()
-                .map(to -> mm.map(to, TransportOperationDTO.class))
-                .toList();
+        if(transportOperations != null){
+            return transportOperations.stream()
+                    .map(to -> mm.map(to, TransportOperationDTO.class))
+                    .toList();
+        }
+        return new ArrayList<>();
     }
 
     private List<GoodDTO> mapGoodsToGoodDTOs(List<Good> goods, ModelMapper mm) {
-        return goods.stream()
-                .map(good -> mm.map(good, GoodDTO.class))
-                .toList();
+        if(goods != null){
+            return goods.stream()
+                    .map(good -> mm.map(good, GoodDTO.class))
+                    .toList();
+        }
+        return new ArrayList<>();
     }
 }

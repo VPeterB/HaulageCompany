@@ -19,9 +19,10 @@ public class LorrySiteService {
 
     @Autowired
     public LorrySiteService(
-            LorrySiteRepository lorrySiteRepository) {
+            LorrySiteRepository lorrySiteRepository,
+            ModelMapper mapper) {
         this.lorrySiteRepository = lorrySiteRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = mapper;
     }
 
     public LorrySiteDTO createLocation(LorrySiteDTO lorrySiteDTO) {
