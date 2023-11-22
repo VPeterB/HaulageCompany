@@ -15,7 +15,7 @@ paths:
       summary: Create a new good and add to lorry site
       operationId: createGood
       parameters:
-        - name: id
+        - name: lorrySiteId
           in: path
           required: true
           type: integer
