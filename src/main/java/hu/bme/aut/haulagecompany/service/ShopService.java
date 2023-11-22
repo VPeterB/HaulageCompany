@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ShopService {
@@ -23,6 +22,9 @@ public class ShopService {
     }
 
     public ShopDTO createShop(ShopDTO shopDTO) {
+        if(shopRepository.findByName(shopDTO.getName()).isPresent()){
+            return new ShopDTO();
+        }
         Shop shop = convertToEntity(shopDTO);
         shop.setOrders(new ArrayList<>());
 
@@ -34,7 +36,7 @@ public class ShopService {
         List<Shop> shops = (List<Shop>) shopRepository.findAll();
         return shops.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public ShopDTO getShopDTOById(Long id) {
@@ -51,9 +53,10 @@ public class ShopService {
         Optional<Shop> existingShop = shopRepository.findById(id);
 
         if (existingShop.isPresent()) {
-            Shop updatedShop = convertToEntity(updatedShopDTO);
+            Shop updatedShop = existingShop.get();
             updatedShop.setId(id);
-
+            updatedShop.setName(updatedShopDTO.getName());
+            updatedShop.setAddress(updatedShopDTO.getAddress());
             Shop savedShop = shopRepository.save(updatedShop);
             return convertToDTO(savedShop);
         } else {

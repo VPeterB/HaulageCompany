@@ -43,7 +43,7 @@ public class OrderService {
         List<Order> orders = (List<Order>) orderRepository.findAll();
         return orders.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public OrderDTO getPurchaseById(Long id) {
@@ -55,7 +55,7 @@ public class OrderService {
         Optional<Order> existingOrder = orderRepository.findById(id);
 
         if (existingOrder.isPresent()) {
-            Order updatedOrder = convertToEntity(updatedOrderDTO);
+            Order updatedOrder = existingOrder.get();
             updatedOrder.setId(id);
             updatedOrder.setShop(shopService.getShopById(updatedOrderDTO.getShopID()));
             updatedOrder.setGoods(goodService.getGoodsByIds(updatedOrderDTO.getGoodIDs()));

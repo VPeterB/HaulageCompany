@@ -10,21 +10,25 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class GoodService {
     private final GoodRepository goodRepository;
     private final ModelMapper modelMapper;
+    private final LorrySiteService lorrySiteService;
 
     @Autowired
-    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper) {
+    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper, LorrySiteService lorrySiteService) {
         this.goodRepository = goodRepository;
         this.modelMapper = modelMapper;
+        this.lorrySiteService = lorrySiteService;
     }
 
-    public GoodDTO createGood(GoodDTO goodDTO) {
+    public GoodDTO createGood(Long lorrySiteId, GoodDTO goodDTO) {
         Good good = convertToEntity(goodDTO);
         Good createdGood = goodRepository.save(good);
+        lorrySiteService.addGood(lorrySiteId, createdGood);
         return convertToDTO(createdGood);
     }
 
@@ -67,6 +71,6 @@ public class GoodService {
     }
 
     public List<Good> getGoodsByIds(List<Long> goodIDs) {
-        return (List<Good>) goodRepository.findAllById(goodIDs);
+        return StreamSupport.stream(goodRepository.findAllById(goodIDs).spliterator(), false).toList();
     }
 }

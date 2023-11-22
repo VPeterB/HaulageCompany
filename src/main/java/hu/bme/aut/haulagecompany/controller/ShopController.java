@@ -18,6 +18,9 @@ public class ShopController {
     @PostMapping
     public ResponseEntity<ShopDTO> createShop(@RequestBody ShopDTO shopDTO) {
         ShopDTO createdShop = shopService.createShop(shopDTO);
+        if(createdShop.getId() == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdShop, HttpStatus.CREATED);
     }
 

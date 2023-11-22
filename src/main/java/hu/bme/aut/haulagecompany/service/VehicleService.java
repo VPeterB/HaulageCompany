@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class VehicleService {
@@ -80,6 +81,6 @@ public class VehicleService {
     }
 
     public List<Vehicle> getVehiclesByIds(List<Long> usedVehicleIDs) {
-        return (List<Vehicle>) vehicleRepository.findAllById(usedVehicleIDs);
+        return StreamSupport.stream(vehicleRepository.findAllById(usedVehicleIDs).spliterator(), false).toList();
     }
 }

@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.LorrySite;
 import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.model.dto.LorrySiteDTO;
@@ -8,9 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,9 +48,10 @@ public class LorrySiteService {
         Optional<LorrySite> existingLocation = lorrySiteRepository.findById(id);
 
         if (existingLocation.isPresent()) {
-            LorrySite updatedLocation = convertToEntity(updatedLocationDTO);
+            LorrySite updatedLocation = existingLocation.get();
             updatedLocation.setId(id);
-
+            updatedLocation.setName(updatedLocationDTO.getName());
+            updatedLocation.setAddress(updatedLocationDTO.getAddress());
             LorrySite savedLocation = lorrySiteRepository.save(updatedLocation);
             return convertToDTO(savedLocation);
         } else {
@@ -82,7 +82,49 @@ public class LorrySiteService {
             List<Vehicle> vehicleList = editable.getVehicles();
             vehicleList.add(createdVehicle);
             editable.setVehicles(vehicleList);
-            lorrySiteRepository.save(edit.get());
+            lorrySiteRepository.save(editable);
         }
+    }
+
+    public void addGood(Long lorrySiteId, Good createdGood) {
+        Optional<LorrySite> edit = lorrySiteRepository.findById(lorrySiteId);
+        if(edit.isPresent()){
+            LorrySite editable = edit.get();
+            List<Good> goodList = editable.getGoods();
+            goodList.add(createdGood);
+            editable.setGoods(goodList);
+            lorrySiteRepository.save(editable);
+        }
+    }
+
+    public void removeGoods(LorrySite lorrySite, List<Good> goods) {
+        var lS = lorrySiteRepository.findById(lorrySite.getId());
+        if(lS.isPresent()){
+            var realLS = lS.get();
+            var lSGoods = new ArrayList<Good>();
+            lSGoods.addAll(realLS.getGoods());
+            lSGoods.addAll(goods);
+            var newGoods = removeGoods(lSGoods);
+            realLS.setGoods(newGoods);
+            lorrySiteRepository.save(realLS);
+        }
+    }
+
+    private List<Good> removeGoods(ArrayList<Good> goods) {
+        Map<String, Good> aggregatedGoods = new HashMap<>();
+        for (Good good : goods) {
+            String key = getKey(good);
+            if (aggregatedGoods.containsKey(key)) {
+                Good existingGood = aggregatedGoods.get(key);
+                existingGood.setQuantity(existingGood.getQuantity() - good.getQuantity());
+            } else {
+                aggregatedGoods.put(key, good);
+            }
+        }
+        return new ArrayList<>(aggregatedGoods.values());
+    }
+
+    private String getKey(Good good) {
+        return good.getName() + "_" + good.getSize() + "_" + good.getWeight();
     }
 }

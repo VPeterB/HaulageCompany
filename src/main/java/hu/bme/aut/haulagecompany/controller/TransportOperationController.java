@@ -18,6 +18,9 @@ public class TransportOperationController {
     @PostMapping
     public ResponseEntity<TransportOperationDTO> createTransportOperation(@RequestBody TransportOperationDTO transportOperationDTO) {
         TransportOperationDTO createdTransportOperation = transportOperationService.createTransportOperation(transportOperationDTO);
+        if(createdTransportOperation == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdTransportOperation, HttpStatus.CREATED);
     }
 
