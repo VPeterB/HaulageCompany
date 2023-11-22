@@ -1,16 +1,23 @@
 package hu.bme.aut.haulagecompany.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "shops")
-public class Shop {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private Long locationId;  // You can change the type according to your actual use case
-    private String contact;
+public class Shop extends Location{
+    @OneToMany(mappedBy="shop")
+    private List<Order> orders;
+
+    public List<Long> getOrderIDs() {
+        List<Long> ids = new ArrayList<>();
+        for(Order o : this.orders){
+            ids.add(o.getId());
+        }
+        return ids;
+    }
 }

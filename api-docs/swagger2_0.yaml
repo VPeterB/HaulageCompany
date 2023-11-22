@@ -10,11 +10,15 @@ consumes:
 produces:
   - "application/json"
 paths:
-  /goods:
+  /goods/{lorrySiteId}:
     post:
-      summary: Create a new good
+      summary: Create a new good and add to lorry site
       operationId: createGood
-      parameters: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
       responses:
         '201':
           description: Created
@@ -24,6 +28,8 @@ paths:
         - "application/json"
       produces:
         - "application/json"
+
+  /goods:
     get:
       summary: Get all goods
       operationId: getAllGoods

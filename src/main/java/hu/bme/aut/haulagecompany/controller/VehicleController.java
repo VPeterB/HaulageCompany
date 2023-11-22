@@ -1,12 +1,13 @@
 package hu.bme.aut.haulagecompany.controller;
 
-import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -15,19 +16,25 @@ public class VehicleController {
     private VehicleService vehicleService;
 
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
-        Vehicle createdVehicle = vehicleService.createVehicle(vehicleDTO);
+    public ResponseEntity<VehicleDTO> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
+        VehicleDTO createdVehicle = vehicleService.createVehicle(vehicleDTO);
+        if(createdVehicle == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if(createdVehicle.getId() == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdVehicle, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Iterable<Vehicle> getAllVehicles() {
-        return vehicleService.getAllVehicles();
+    public ResponseEntity<List<VehicleDTO>> getAllVehicles() {
+        return new ResponseEntity<>(vehicleService.getAllVehicles(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
-        Vehicle vehicle = vehicleService.getVehicleById(id);
+    public ResponseEntity<VehicleDTO> getVehicleById(@PathVariable Long id) {
+        VehicleDTO vehicle = vehicleService.getVehicleById(id);
         if (vehicle != null) {
             return new ResponseEntity<>(vehicle, HttpStatus.OK);
         } else {
@@ -36,8 +43,8 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody VehicleDTO vehicleDTO) {
-        Vehicle updatedVehicle = vehicleService.updateVehicle(id, vehicleDTO);
+    public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable Long id, @RequestBody VehicleDTO vehicleDTO) {
+        VehicleDTO updatedVehicle = vehicleService.updateVehicle(id, vehicleDTO);
         if (updatedVehicle != null) {
             return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
         } else {

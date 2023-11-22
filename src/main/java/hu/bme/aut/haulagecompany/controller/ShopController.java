@@ -1,12 +1,13 @@
 package hu.bme.aut.haulagecompany.controller;
 
-import hu.bme.aut.haulagecompany.model.Shop;
 import hu.bme.aut.haulagecompany.model.dto.ShopDTO;
 import hu.bme.aut.haulagecompany.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/shops")
@@ -15,19 +16,22 @@ public class ShopController {
     private ShopService shopService;
 
     @PostMapping
-    public ResponseEntity<Shop> createShop(@RequestBody ShopDTO shopDTO) {
-        Shop createdShop = shopService.createShop(shopDTO);
+    public ResponseEntity<ShopDTO> createShop(@RequestBody ShopDTO shopDTO) {
+        ShopDTO createdShop = shopService.createShop(shopDTO);
+        if(createdShop.getId() == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdShop, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Iterable<Shop> getAllShops() {
-        return shopService.getAllShops();
+    public  ResponseEntity<List<ShopDTO>> getAllShops() {
+        return new ResponseEntity<>(shopService.getAllShops(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Shop> getShopById(@PathVariable Long id) {
-        Shop shop = shopService.getShopById(id);
+    public ResponseEntity<ShopDTO> getShopById(@PathVariable Long id) {
+        ShopDTO shop = shopService.getShopDTOById(id);
         if (shop != null) {
             return new ResponseEntity<>(shop, HttpStatus.OK);
         } else {
@@ -36,8 +40,8 @@ public class ShopController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Shop> updateShop(@PathVariable Long id, @RequestBody ShopDTO shopDTO) {
-        Shop updatedShop = shopService.updateShop(id, shopDTO);
+    public ResponseEntity<ShopDTO> updateShop(@PathVariable Long id, @RequestBody ShopDTO shopDTO) {
+        ShopDTO updatedShop = shopService.updateShop(id, shopDTO);
         if (updatedShop != null) {
             return new ResponseEntity<>(updatedShop, HttpStatus.OK);
         } else {

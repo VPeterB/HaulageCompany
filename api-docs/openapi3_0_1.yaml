@@ -7,21 +7,6 @@ servers:
   - url: /api
 paths:
   /goods:
-    post:
-      summary: Create a new good
-      operationId: createGood
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GoodDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GoodDTO'
     get:
       summary: Get all goods
       operationId: getAllGoods
@@ -34,6 +19,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GoodDTO'
+
+  /goods/{lorrySiteId}:
+    post:
+      summary: Create a new good and add to lorry site
+      operationId: createGood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoodDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodDTO'
 
   /goods/{id}:
     get:

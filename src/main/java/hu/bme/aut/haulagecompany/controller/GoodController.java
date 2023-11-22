@@ -1,34 +1,39 @@
 package hu.bme.aut.haulagecompany.controller;
 
-import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.service.GoodService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Objects;
+
 @RestController
+@Validated
 @RequestMapping("/api/goods")
 public class GoodController {
     @Autowired
     private GoodService goodService;
 
-    @PostMapping
-    public ResponseEntity<Good> createGood(@RequestBody GoodDTO goodDTO) {
-        Good createdGood = goodService.createGood(goodDTO);
+    @PostMapping("/{lorrySiteId}")
+    public ResponseEntity<GoodDTO> createGood(@PathVariable Long lorrySiteId, @Validated @RequestBody GoodDTO goodDTO) {
+        GoodDTO createdGood = goodService.createGood(lorrySiteId, goodDTO);
         return new ResponseEntity<>(createdGood, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Iterable<Good> getAllGoods() {
-        return goodService.getAllGoods();
+    public ResponseEntity<List<GoodDTO>> getAllGoods() {
+        return new ResponseEntity<>(goodService.getAllGoods(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Good> getGoodById(@PathVariable Long id) {
-        Good good = goodService.getGoodById(id);
-        if (good != null) {
+    public ResponseEntity<GoodDTO> getGoodById(@PathVariable Long id) {
+        GoodDTO good = goodService.getGoodById(id);
+        if (Objects.nonNull(good)) {
             return new ResponseEntity<>(good, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -36,9 +41,9 @@ public class GoodController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Good> updateGood(@PathVariable Long id, @RequestBody GoodDTO goodDTO) {
-        Good updatedGood = goodService.updateGood(id, goodDTO);
-        if (updatedGood != null) {
+    public ResponseEntity<GoodDTO> updateGood(@PathVariable Long id, @RequestBody GoodDTO goodDTO) {
+        GoodDTO updatedGood = goodService.updateGood(id, goodDTO);
+        if (Objects.nonNull(updatedGood)) {
             return new ResponseEntity<>(updatedGood, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

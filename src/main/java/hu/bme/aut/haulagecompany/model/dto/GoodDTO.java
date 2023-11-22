@@ -1,10 +1,18 @@
 package hu.bme.aut.haulagecompany.model.dto;
 
+import jakarta.annotation.Nullable;
 import lombok.Data;
 
 @Data
 public class GoodDTO {
+    @Nullable
+    private Long id;
     private String name;
+    @Nullable
     private String description;
-    private Double price;  // You can change the type according to your actual use case
+    @Nullable
+    private Double size;
+    @Nullable
+    private Double weight;
+    private int quantity;
 }

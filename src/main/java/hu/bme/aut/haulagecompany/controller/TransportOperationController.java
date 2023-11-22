@@ -1,12 +1,13 @@
 package hu.bme.aut.haulagecompany.controller;
 
-import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
 import hu.bme.aut.haulagecompany.service.TransportOperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/transport-operations")
@@ -15,19 +16,22 @@ public class TransportOperationController {
     private TransportOperationService transportOperationService;
 
     @PostMapping
-    public ResponseEntity<TransportOperation> createTransportOperation(@RequestBody TransportOperationDTO transportOperationDTO) {
-        TransportOperation createdTransportOperation = transportOperationService.createTransportOperation(transportOperationDTO);
+    public ResponseEntity<TransportOperationDTO> createTransportOperation(@RequestBody TransportOperationDTO transportOperationDTO) {
+        TransportOperationDTO createdTransportOperation = transportOperationService.createTransportOperation(transportOperationDTO);
+        if(createdTransportOperation == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(createdTransportOperation, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public Iterable<TransportOperation> getAllTransportOperations() {
-        return transportOperationService.getAllTransportOperations();
+    public ResponseEntity<List<TransportOperationDTO>> getAllTransportOperations() {
+        return new ResponseEntity<>(transportOperationService.getAllTransportOperations(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransportOperation> getTransportOperationById(@PathVariable Long id) {
-        TransportOperation transportOperation = transportOperationService.getTransportOperationById(id);
+    public ResponseEntity<TransportOperationDTO> getTransportOperationById(@PathVariable Long id) {
+        TransportOperationDTO transportOperation = transportOperationService.getTransportOperationDTOById(id);
         if (transportOperation != null) {
             return new ResponseEntity<>(transportOperation, HttpStatus.OK);
         } else {
@@ -36,8 +40,8 @@ public class TransportOperationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransportOperation> updateTransportOperation(@PathVariable Long id, @RequestBody TransportOperationDTO transportOperationDTO) {
-        TransportOperation updatedTransportOperation = transportOperationService.updateTransportOperation(id, transportOperationDTO);
+    public ResponseEntity<TransportOperationDTO> updateTransportOperation(@PathVariable Long id, @RequestBody TransportOperationDTO transportOperationDTO) {
+        TransportOperationDTO updatedTransportOperation = transportOperationService.updateTransportOperation(id, transportOperationDTO);
         if (updatedTransportOperation != null) {
             return new ResponseEntity<>(updatedTransportOperation, HttpStatus.OK);
         } else {

@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "locations")
 public class Location {
     @Id

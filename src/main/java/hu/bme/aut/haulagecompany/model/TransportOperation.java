@@ -1,8 +1,11 @@
 package hu.bme.aut.haulagecompany.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,10 +15,18 @@ public class TransportOperation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long vehicleId;
-    private Long shopId;
-    @OneToMany(mappedBy = "transportOperation")
-    private List<TransportedGood> goods; // Define TransportedGood as a separate class
+    private Timestamp date;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Vehicle> usedVehicles;
+    @OneToOne
+    @Nullable
+    private Order order;
 
-    // You can add additional fields as needed
+    public List<Long> getUsedVehicleIds() {
+        List<Long> ids = new ArrayList<>();
+        for(Vehicle v : this.usedVehicles){
+            ids.add(v.getId());
+        }
+        return ids;
+    }
 }
