@@ -28,6 +28,7 @@ paths:
         - "application/json"
       produces:
         - "application/json"
+
   /goods:
     get:
       summary: Get all goods

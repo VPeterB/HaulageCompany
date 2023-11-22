@@ -6,7 +6,6 @@ info:
 servers:
   - url: /api
 paths:
-
   /goods:
     get:
       summary: Get all goods
