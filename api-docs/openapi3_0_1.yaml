@@ -381,6 +381,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TransportOperationDTO'
       responses:
+        '409':
+          description: Conflict
         '201':
           description: Created
           content:
@@ -469,6 +471,10 @@ paths:
             schema:
               $ref: '#/components/schemas/VehicleDTO'
       responses:
+        '409':
+          description: Conflict
+        '404':
+          description: Not Found
         '201':
           description: Created
           content:

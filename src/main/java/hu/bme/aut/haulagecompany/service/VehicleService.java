@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.repository.VehicleRepository;
@@ -56,10 +57,11 @@ public class VehicleService {
         Optional<Vehicle> existingVehicle = vehicleRepository.findById(id);
 
         if (existingVehicle.isPresent()) {
-            Vehicle updatedVehicle = convertToEntity(updatedVehicleDTO);
-            updatedVehicle.setId(id);
+            Vehicle updatedVehicle = existingVehicle.get();
+            updatedVehicle.setLicensePlate(updatedVehicleDTO.getLicensePlate());
+            updatedVehicle.setSize(updatedVehicleDTO.getSize());
+            updatedVehicle.setMaxWeight(updatedVehicleDTO.getMaxWeight());
             updatedVehicle.setLocation(lorrySiteService.findById(updatedVehicleDTO.getLorrySiteID()).orElse(existingVehicle.get().getLocation()));
-            updatedVehicle.setTransportOperations(existingVehicle.get().getTransportOperations());
             Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
             return convertToDTO(savedVehicle);
         } else {
@@ -81,5 +83,15 @@ public class VehicleService {
 
     public List<Vehicle> getVehiclesByIds(List<Long> usedVehicleIDs) {
         return StreamSupport.stream(vehicleRepository.findAllById(usedVehicleIDs).spliterator(), false).toList();
+    }
+
+    public void addTransportOperation(TransportOperation createdTransportOperation) {
+        var vehicles = vehicleRepository.findAllById(createdTransportOperation.getUsedVehicleIds());
+        vehicles.forEach(v -> {
+            var tos = v.getTransportOperations();
+            tos.add(createdTransportOperation);
+            v.setTransportOperations(tos);
+            vehicleRepository.save(v);
+        });
     }
 }

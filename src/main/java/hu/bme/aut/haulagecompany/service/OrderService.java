@@ -1,6 +1,7 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Order;
+import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.dto.GetOrderDTO;
 import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.repository.OrderRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 public class OrderService {
@@ -34,8 +36,8 @@ public class OrderService {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
         order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
-
         Order createdOrder = orderRepository.save(order);
+        shopService.addOrder(createdOrder);
         return convertToGetDTO(createdOrder);
     }
 
@@ -44,8 +46,7 @@ public class OrderService {
     }
 
     public List<GetOrderDTO> getAllOrders() {
-        List<Order> orders = (List<Order>) orderRepository.findAll();
-        return orders.stream()
+        return StreamSupport.stream(orderRepository.findAll().spliterator(), false)
                 .map(this::convertToGetDTO)
                 .toList();
     }
@@ -82,5 +83,16 @@ public class OrderService {
     public Order getOrderById(Long orderID) {
         Optional<Order> order = orderRepository.findById(orderID);
         return order.orElse(null);
+    }
+
+    public void setTransportOperation(TransportOperation createdTransportOperation) {
+        if(createdTransportOperation.getOrder() != null){
+            var order = orderRepository.findById(createdTransportOperation.getOrder().getId());
+            if(order.isPresent()){
+                Order realOrder = order.get();
+                realOrder.setTransportOperation(createdTransportOperation);
+                orderRepository.save(realOrder);
+            }
+        }
     }
 }

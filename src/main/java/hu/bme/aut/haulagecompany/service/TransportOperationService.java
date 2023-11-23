@@ -43,6 +43,10 @@ public class TransportOperationService {
         transportOperation.setOrder(orderService.getOrderById(transportOperationDTO.getOrderID()));
         TransportOperation createdTransportOperation = transportOperationRepository.save(transportOperation);
 
+        vehicleService.addTransportOperation(createdTransportOperation);
+        orderService.setTransportOperation(createdTransportOperation);
+
+
         var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
         lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
         return convertToDTO(createdTransportOperation);

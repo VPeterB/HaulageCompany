@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.Order;
 import hu.bme.aut.haulagecompany.model.Shop;
 import hu.bme.aut.haulagecompany.model.dto.ShopDTO;
 import hu.bme.aut.haulagecompany.repository.ShopRepository;
@@ -74,5 +75,16 @@ public class ShopService {
 
     private Shop convertToEntity(ShopDTO shopDTO) {
         return modelMapper.map(shopDTO, Shop.class);
+    }
+
+    public void addOrder(Order createdOrder) {
+        Optional<Shop> shop = shopRepository.findById(createdOrder.getShop().getId());
+        if(shop.isPresent()){
+            Shop realShop = shop.get();
+            List<Order> orders = realShop.getOrders();
+            orders.add(createdOrder);
+            realShop.setOrders(orders);
+            shopRepository.save(realShop);
+        }
     }
 }

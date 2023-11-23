@@ -52,5 +52,5 @@ public class LorrySiteController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //TODO addGoodsToStorage
+    //TODO refactor addGoodsToStorage
 }
