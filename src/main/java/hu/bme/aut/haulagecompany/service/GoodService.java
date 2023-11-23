@@ -7,9 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -33,10 +31,10 @@ public class GoodService {
     }
 
     public List<GoodDTO> getAllGoods() {
-        List<Good> goods = (List<Good>) goodRepository.findAll();
-        return goods.stream()
+        List<Good> goodsList = lorrySiteService.aggregateGoods(StreamSupport.stream(goodRepository.findAll().spliterator(), false).toList(), true);
+        return goodsList.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public GoodDTO getGoodById(Long id) {

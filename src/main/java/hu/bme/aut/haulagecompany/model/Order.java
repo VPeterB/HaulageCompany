@@ -1,10 +1,8 @@
 package hu.bme.aut.haulagecompany.model;
 
-import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

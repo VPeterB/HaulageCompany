@@ -119,7 +119,8 @@ public class LorrySiteService {
             LorrySite editable = edit.get();
             List<Good> goodList = editable.getGoods();
             goodList.add(createdGood);
-            editable.setGoods(goodList);
+            List<Good> aggregatedGoodList = aggregateGoods(goodList, true);
+            editable.setGoods(aggregatedGoodList);
             lorrySiteRepository.save(editable);
         }
     }
@@ -138,12 +139,20 @@ public class LorrySiteService {
     }
 
     private List<Good> removeGoods(ArrayList<Good> goods) {
+        return aggregateGoods(goods, false);
+    }
+
+    public List<Good> aggregateGoods(List<Good> goods, boolean add){
         Map<String, Good> aggregatedGoods = new HashMap<>();
         for (Good good : goods) {
             String key = getKey(good);
             if (aggregatedGoods.containsKey(key)) {
                 Good existingGood = aggregatedGoods.get(key);
-                existingGood.setQuantity(existingGood.getQuantity() - good.getQuantity());
+                if(add){
+                    existingGood.setQuantity(existingGood.getQuantity() + good.getQuantity());
+                }else{
+                    existingGood.setQuantity(existingGood.getQuantity() - good.getQuantity());
+                }
             } else {
                 aggregatedGoods.put(key, good);
             }
@@ -151,7 +160,7 @@ public class LorrySiteService {
         return new ArrayList<>(aggregatedGoods.values());
     }
 
-    private String getKey(Good good) {
+    private String getKey(Good good) { //Good unique key
         return good.getName() + "_" + good.getSize() + "_" + good.getWeight();
     }
 }

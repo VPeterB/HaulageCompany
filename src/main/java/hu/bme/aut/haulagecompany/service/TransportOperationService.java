@@ -46,7 +46,7 @@ public class TransportOperationService {
         TransportOperation createdTransportOperation = transportOperationRepository.save(transportOperation);
 
         var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
-        lorrySiteService.removeGoods(vehicles.get(1).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
+        lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
         return convertToDTO(createdTransportOperation);
     }
 
@@ -57,7 +57,7 @@ public class TransportOperationService {
         vehicles.forEach(v -> lorrySites.add(v.getLocation()));
         var lorrySiteGoods = new ArrayList<Good>();
         lorrySites.forEach(l -> lorrySiteGoods.addAll(l.getGoods()));
-        var summedGoods = aggregateGoods(lorrySiteGoods);
+        var summedGoods = lorrySiteService.aggregateGoods(lorrySiteGoods, true);
         var orderedGoods = order.getGoods();
         AtomicBoolean res = new AtomicBoolean(true);
         orderedGoods.forEach(og -> summedGoods.forEach(g -> {
@@ -67,24 +67,6 @@ public class TransportOperationService {
             }
         }));
         return res.get();
-    }
-
-    private List<Good> aggregateGoods(ArrayList<Good> goods) {
-        Map<String, Good> aggregatedGoods = new HashMap<>();
-        for (Good good : goods) {
-            String key = getKey(good);
-            if (aggregatedGoods.containsKey(key)) {
-                Good existingGood = aggregatedGoods.get(key);
-                existingGood.setQuantity(existingGood.getQuantity() + good.getQuantity());
-            } else {
-                aggregatedGoods.put(key, good);
-            }
-        }
-        return new ArrayList<>(aggregatedGoods.values());
-    }
-
-    private String getKey(Good good) {
-        return good.getName() + "_" + good.getSize() + "_" + good.getWeight();
     }
 
     private boolean checkVehicleAvailable(Timestamp date, List<Long> usedVehicleIDs) {
