@@ -1,9 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
-import hu.bme.aut.haulagecompany.model.Good;
-import hu.bme.aut.haulagecompany.model.LorrySite;
-import hu.bme.aut.haulagecompany.model.TransportOperation;
-import hu.bme.aut.haulagecompany.model.Vehicle;
+import hu.bme.aut.haulagecompany.model.*;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
 import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import org.modelmapper.ModelMapper;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.ToDoubleFunction;
 
 @Service
 public class TransportOperationService {
@@ -38,7 +36,7 @@ public class TransportOperationService {
 
     public TransportOperationDTO createTransportOperation(TransportOperationDTO transportOperationDTO) {
         TransportOperation transportOperation = convertToEntity(transportOperationDTO);
-        if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO)){
+        if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO) && checkVehicleSizesAreGood(transportOperationDTO)){
             return null;
         }
         transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs()));
@@ -48,6 +46,25 @@ public class TransportOperationService {
         var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
         lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
         return convertToDTO(createdTransportOperation);
+    }
+
+    private boolean checkVehicleSizesAreGood(TransportOperationDTO transportOperationDTO) {
+        List<Vehicle> vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
+        double summedVehicleSize = sumAttribute(vehicles, Vehicle::getSize);
+        double summedVehicleMaxWeight = sumAttribute(vehicles, Vehicle::getMaxWeight);
+
+        Order order = orderService.getOrderById(transportOperationDTO.getOrderID());
+        List<Good> orderedGoods = order.getGoods();
+        double summedOrderedGoodsSize = sumAttribute(orderedGoods, Good::getSize);
+        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, Good::getWeight);
+
+        return (summedOrderedGoodsSize <= summedVehicleSize) && (summedOrderedGoodsWeight <= summedVehicleMaxWeight);
+    }
+
+    private <T> double sumAttribute(List<T> items, ToDoubleFunction<T> attributeExtractor) {
+        return items.stream()
+                .mapToDouble(attributeExtractor)
+                .sum();
     }
 
     private boolean checkGoodsAvailable(TransportOperationDTO transportOperationDTO) {
