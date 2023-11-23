@@ -190,7 +190,7 @@ paths:
         '404':
           description: Not Found
 
-  /api/orders:
+  /orders:
     post:
       summary: Create a new order
       operationId: createOrder
@@ -222,7 +222,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/GetOrderDTO'
 
-  /api/orders/{id}:
+  /orders/{id}:
     get:
       summary: Get an order by ID
       operationId: getOrderById
