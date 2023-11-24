@@ -22,15 +22,11 @@ public class ModelMapperConfig {
             mapper.map(src -> mapTransportOperationsToTransportOperationDTOs(src.getTransportOperations(), mm), VehicleDTO::setTransportOperationDTOs);
         });
 
-        mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> {
-            mapper.map(TransportOperation::getUsedVehicleIds, TransportOperationDTO::setUsedVehicleIDs);
-        });
+        mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> mapper.map(TransportOperation::getUsedVehicleIds, TransportOperationDTO::setUsedVehicleIDs));
 
         mm.typeMap(Shop.class, ShopDTO.class).addMappings(mapper-> mapper.map(Shop::getOrderIDs, ShopDTO::setOrderIDs));
 
-        mm.typeMap(Order.class, GetOrderDTO.class).addMappings(mapper -> {
-            mapper.map(src -> mapGoodsToGoodDTOs(src.getGoods(), mm), GetOrderDTO::setGoodDTOs);
-        });
+        mm.typeMap(Order.class, GetOrderDTO.class).addMappings(mapper -> mapper.map(src -> mapGoodsToGoodDTOs(src.getGoods(), mm), GetOrderDTO::setGoodDTOs));
 
         mm.typeMap(LorrySite.class, LorrySiteDTO.class).addMappings(mapper -> {
             mapper.map(src -> mapVehiclesToVehicleDTOs(src.getVehicles(), mm), LorrySiteDTO::setVehicleDTOs);

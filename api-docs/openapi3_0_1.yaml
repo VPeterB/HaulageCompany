@@ -665,8 +665,8 @@ components:
         id:
           type: integer
           nullable: true
-        shopID:
-          type: integer
+        shopDTO:
+          $ref: '#/components/schemas/ShopDTO'
         goodDTOs:
           type: array
           items:

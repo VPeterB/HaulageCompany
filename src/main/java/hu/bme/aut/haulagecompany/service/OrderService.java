@@ -48,7 +48,9 @@ public class OrderService {
     }
 
     private GetOrderDTO convertToGetDTO(Order createdOrder) {
-        return modelMapper.map(createdOrder, GetOrderDTO.class);
+        GetOrderDTO newDTO = modelMapper.map(createdOrder, GetOrderDTO.class);
+        newDTO.setShopDTO(shopService.convertToDTO(createdOrder.getShop()));
+        return newDTO;
     }
 
     public List<GetOrderDTO> getAllOrders() {

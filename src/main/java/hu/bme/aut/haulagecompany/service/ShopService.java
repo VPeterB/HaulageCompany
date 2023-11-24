@@ -69,7 +69,7 @@ public class ShopService {
         shopRepository.deleteById(id);
     }
 
-    private ShopDTO convertToDTO(Shop shop) {
+    public ShopDTO convertToDTO(Shop shop) {
         return modelMapper.map(shop, ShopDTO.class);
     }
 
