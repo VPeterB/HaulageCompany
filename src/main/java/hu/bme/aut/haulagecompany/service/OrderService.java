@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -35,9 +36,14 @@ public class OrderService {
     public GetOrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
-        order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
+        if(orderDTO.getGoodIDs() == null){
+            order.setGoods(new ArrayList<>());
+        }else if (orderDTO.getGoodIDs().isEmpty()){
+            order.setGoods(new ArrayList<>());
+        }else {
+            order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
+        }
         Order createdOrder = orderRepository.save(order);
-        shopService.addOrder(createdOrder);
         return convertToGetDTO(createdOrder);
     }
 
@@ -83,16 +89,5 @@ public class OrderService {
     public Order getOrderById(Long orderID) {
         Optional<Order> order = orderRepository.findById(orderID);
         return order.orElse(null);
-    }
-
-    public void setTransportOperation(TransportOperation createdTransportOperation) {
-        if(createdTransportOperation.getOrder() != null){
-            var order = orderRepository.findById(createdTransportOperation.getOrder().getId());
-            if(order.isPresent()){
-                Order realOrder = order.get();
-                realOrder.setTransportOperation(createdTransportOperation);
-                orderRepository.save(realOrder);
-            }
-        }
     }
 }

@@ -1,12 +1,15 @@
 package hu.bme.aut.haulagecompany.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Table(name = "orders")
 public class Order {
     @Id
@@ -16,6 +19,7 @@ public class Order {
     @JoinColumn(name = "shop_id")
     private Shop shop;
     @OneToMany
+    @ToString.Exclude
     private List<Good> goods;
     @OneToOne
     private TransportOperation transportOperation;

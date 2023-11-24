@@ -36,15 +36,15 @@ public class TransportOperationService {
 
     public TransportOperationDTO createTransportOperation(TransportOperationDTO transportOperationDTO) {
         TransportOperation transportOperation = convertToEntity(transportOperationDTO);
+        if(transportOperationRepository.findByOrderId(transportOperationDTO.getOrderID()).isPresent()){
+            return null;
+        }
         if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO) && checkVehicleSizesAreGood(transportOperationDTO)){
             return null;
         }
         transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs()));
         transportOperation.setOrder(orderService.getOrderById(transportOperationDTO.getOrderID()));
         TransportOperation createdTransportOperation = transportOperationRepository.save(transportOperation);
-
-        vehicleService.addTransportOperation(createdTransportOperation);
-        orderService.setTransportOperation(createdTransportOperation);
 
 
         var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());

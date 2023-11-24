@@ -23,21 +23,12 @@ public class ModelMapperConfig {
         });
 
         mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> {
-            mapper.map(src -> {
-                if(src.getOrder() == null) return null;
-                return src.getOrder().getId();
-            }, TransportOperationDTO::setOrderID);
             mapper.map(TransportOperation::getUsedVehicleIds, TransportOperationDTO::setUsedVehicleIDs);
         });
 
         mm.typeMap(Shop.class, ShopDTO.class).addMappings(mapper-> mapper.map(Shop::getOrderIDs, ShopDTO::setOrderIDs));
 
         mm.typeMap(Order.class, GetOrderDTO.class).addMappings(mapper -> {
-            mapper.map(src -> mm.map(src.getShop(), ShopDTO.class), GetOrderDTO::setShopDTO);
-            mapper.map(src -> {
-                if(src.getTransportOperation() == null) return null;
-                return src.getTransportOperation().getId();
-            }, GetOrderDTO::setTransportOperationID);
             mapper.map(src -> mapGoodsToGoodDTOs(src.getGoods(), mm), GetOrderDTO::setGoodDTOs);
         });
 

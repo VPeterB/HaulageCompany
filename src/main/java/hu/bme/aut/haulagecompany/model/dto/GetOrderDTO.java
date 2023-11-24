@@ -9,7 +9,7 @@ import java.util.List;
 public class GetOrderDTO {
     @Nullable
     private Long id;
-    private ShopDTO shopDTO;
+    private Long shopID;
     private List<GoodDTO> goodDTOs;
     @Nullable
     private Long transportOperationID;

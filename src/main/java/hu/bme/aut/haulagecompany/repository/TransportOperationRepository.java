@@ -4,7 +4,9 @@ import hu.bme.aut.haulagecompany.model.TransportOperation;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface TransportOperationRepository extends CrudRepository<TransportOperation, Long> {
-    // Custom queries can be added here if needed
+    Optional<TransportOperation> findByOrderId(Long orderID);
 }

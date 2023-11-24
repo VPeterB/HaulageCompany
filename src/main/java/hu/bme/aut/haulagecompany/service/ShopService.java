@@ -77,14 +77,4 @@ public class ShopService {
         return modelMapper.map(shopDTO, Shop.class);
     }
 
-    public void addOrder(Order createdOrder) {
-        Optional<Shop> shop = shopRepository.findById(createdOrder.getShop().getId());
-        if(shop.isPresent()){
-            Shop realShop = shop.get();
-            List<Order> orders = realShop.getOrders();
-            orders.add(createdOrder);
-            realShop.setOrders(orders);
-            shopRepository.save(realShop);
-        }
-    }
 }
