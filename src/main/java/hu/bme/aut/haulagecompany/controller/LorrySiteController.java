@@ -1,6 +1,7 @@
 package hu.bme.aut.haulagecompany.controller;
 
 import hu.bme.aut.haulagecompany.model.dto.LorrySiteDTO;
+import hu.bme.aut.haulagecompany.model.dto.StackedGoodDTO;
 import hu.bme.aut.haulagecompany.service.LorrySiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,5 +51,15 @@ public class LorrySiteController {
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
         lorrySiteService.deleteLocation(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/addGood")
+    public ResponseEntity<LorrySiteDTO> addGoodToLocation(@PathVariable Long id, @RequestBody StackedGoodDTO stackedGoodDTO) {
+        LorrySiteDTO updatedLocation = lorrySiteService.addGood(id, stackedGoodDTO);
+        if (updatedLocation != null) {
+            return new ResponseEntity<>(updatedLocation, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

@@ -2,16 +2,15 @@ package hu.bme.aut.haulagecompany.model.dto;
 
 import jakarta.annotation.Nullable;
 import lombok.Data;
+
 import java.util.List;
 
 @Data
-public class LorrySiteDTO {
+public class GetOrderDTO {
     @Nullable
     private Long id;
-    private String name;
-    private String address;
-    @Nullable
+    private ShopDTO shopDTO;
     private List<GetStackedGoodDTO> goodDTOs;
     @Nullable
-    private List<Long> vehicleIDs;
+    private Long transportOperationID;
 }

@@ -25,16 +25,14 @@ public class GoodService {
         this.lorrySiteService = lorrySiteService;
     }
 
-    public GoodDTO createGood(Long lorrySiteId, GoodDTO goodDTO) {
+    public GoodDTO createGood(GoodDTO goodDTO) {
         Good good = convertToEntity(goodDTO);
         Good createdGood = goodRepository.save(good);
-        lorrySiteService.addGood(lorrySiteId, createdGood);
         return convertToDTO(createdGood);
     }
 
     public List<GoodDTO> getAllGoods() {
-        List<Good> goods = (List<Good>) goodRepository.findAll();
-        return goods.stream()
+        return StreamSupport.stream(goodRepository.findAll().spliterator(), false)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

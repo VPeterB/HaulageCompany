@@ -4,6 +4,9 @@ import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.LorrySite;
 import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.model.dto.LorrySiteDTO;
+import hu.bme.aut.haulagecompany.model.*;
+import hu.bme.aut.haulagecompany.model.dto.StackedGoodDTO;
+import hu.bme.aut.haulagecompany.repository.GoodRepository;
 import hu.bme.aut.haulagecompany.repository.LorrySiteRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +18,17 @@ import java.util.stream.Collectors;
 @Service
 public class LorrySiteService {
     private final LorrySiteRepository lorrySiteRepository;
+    private final GoodRepository goodRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
     public LorrySiteService(
-            LorrySiteRepository lorrySiteRepository) {
+            LorrySiteRepository lorrySiteRepository,
+            GoodRepository goodRepository,
+            ModelMapper mapper) {
         this.lorrySiteRepository = lorrySiteRepository;
-        this.modelMapper = new ModelMapper();
+        this.goodRepository = goodRepository;
+        this.modelMapper = mapper;
     }
 
     public LorrySiteDTO createLocation(LorrySiteDTO lorrySiteDTO) {
@@ -86,22 +93,34 @@ public class LorrySiteService {
         }
     }
 
-    public void addGood(Long lorrySiteId, Good createdGood) {
+    public LorrySiteDTO addGood(Long lorrySiteId, StackedGoodDTO good) {
         Optional<LorrySite> edit = lorrySiteRepository.findById(lorrySiteId);
         if(edit.isPresent()){
             LorrySite editable = edit.get();
-            List<Good> goodList = editable.getGoods();
-            goodList.add(createdGood);
-            editable.setGoods(goodList);
-            lorrySiteRepository.save(editable);
+            List<InventoryGood> goodList = editable.getGoods();
+            goodList.add(convertToInventoryGood(lorrySiteId, good));
+            List<InventoryGood> aggregatedGoodList = aggregateGoods(goodList, true);
+            editable.setGoods(aggregatedGoodList);
+            return convertToDTO(lorrySiteRepository.save(editable));
         }
+        return null;
     }
 
-    public void removeGoods(LorrySite lorrySite, List<Good> goods) {
+    private InventoryGood convertToInventoryGood(Long lorrySiteId, StackedGoodDTO good) { //TODO create
+        InventoryGood ig = new InventoryGood();
+        LorrySite ls = lorrySiteRepository.findById(lorrySiteId).orElse(null);
+        ig.setLorrySite(ls);
+        ig.setQuantity(good.getQuantity());
+        Good g = goodRepository.findById(good.getGoodId()).orElse(null);
+        ig.setGood(g);
+        return ig;
+    }
+
+    public void removeGoods(LorrySite lorrySite, List<InventoryGood> goods) {
         var lS = lorrySiteRepository.findById(lorrySite.getId());
         if(lS.isPresent()){
             var realLS = lS.get();
-            var lSGoods = new ArrayList<Good>();
+            var lSGoods = new ArrayList<InventoryGood>();
             lSGoods.addAll(realLS.getGoods());
             lSGoods.addAll(goods);
             var newGoods = removeGoods(lSGoods);
@@ -110,13 +129,21 @@ public class LorrySiteService {
         }
     }
 
-    private List<Good> removeGoods(ArrayList<Good> goods) {
-        Map<String, Good> aggregatedGoods = new HashMap<>();
-        for (Good good : goods) {
+    private List<InventoryGood> removeGoods(ArrayList<InventoryGood> goods) {
+        return aggregateGoods(goods, false);
+    }
+
+    public List<InventoryGood> aggregateGoods(List<InventoryGood> goods, boolean add){
+        Map<String, InventoryGood> aggregatedGoods = new HashMap<>();
+        for (InventoryGood good : goods) {
             String key = getKey(good);
             if (aggregatedGoods.containsKey(key)) {
-                Good existingGood = aggregatedGoods.get(key);
-                existingGood.setQuantity(existingGood.getQuantity() - good.getQuantity());
+                InventoryGood existingGood = aggregatedGoods.get(key);
+                if(add){
+                    existingGood.setQuantity(existingGood.getQuantity() + good.getQuantity());
+                }else{
+                    existingGood.setQuantity(existingGood.getQuantity() - good.getQuantity());
+                }
             } else {
                 aggregatedGoods.put(key, good);
             }
@@ -124,7 +151,7 @@ public class LorrySiteService {
         return new ArrayList<>(aggregatedGoods.values());
     }
 
-    private String getKey(Good good) {
-        return good.getName() + "_" + good.getSize() + "_" + good.getWeight();
+    private String getKey(InventoryGood good) { //Good unique key
+        return good.getGood().getName() + "_" + good.getGood().getSize() + "_" + good.getGood().getWeight();
     }
 }

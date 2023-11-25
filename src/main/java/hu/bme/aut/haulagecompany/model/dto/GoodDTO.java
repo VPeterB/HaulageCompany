@@ -14,5 +14,4 @@ public class GoodDTO {
     private Double size;
     @Nullable
     private Double weight;
-    private int quantity;
 }

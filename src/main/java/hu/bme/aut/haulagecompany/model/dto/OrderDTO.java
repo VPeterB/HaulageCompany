@@ -10,7 +10,7 @@ public class OrderDTO {
     @Nullable
     private Long id;
     private Long shopID;
-    private List<Long> goodIDs;
+    private List<StackedGoodDTO> stackedGoodDTOs;
     @Nullable
     private Long transportOperationID;
 }

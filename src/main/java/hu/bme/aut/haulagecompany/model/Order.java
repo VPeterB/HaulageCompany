@@ -2,6 +2,7 @@ package hu.bme.aut.haulagecompany.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,11 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;
-    @OneToMany
-    private List<Good> goods;
+
+    @OneToMany(mappedBy = "order")
+    @ToString.Exclude
+    private List<OrderedGood> goods;
+
     @OneToOne
     private TransportOperation transportOperation;
 
