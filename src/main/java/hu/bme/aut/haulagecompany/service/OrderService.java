@@ -1,7 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Order;
-import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.dto.GetOrderDTO;
 import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.repository.OrderRepository;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 public class OrderService {

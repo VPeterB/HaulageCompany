@@ -21,4 +21,12 @@ public class TransportOperation {
     @OneToOne
     @Nullable
     private Order order;
+
+    public List<Long> getUsedVehicleIds() {
+        List<Long> ids = new ArrayList<>();
+        for(Vehicle v : this.usedVehicles){
+            ids.add(v.getId());
+        }
+        return ids;
+    }
 }

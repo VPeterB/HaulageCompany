@@ -7,10 +7,7 @@ import lombok.ToString;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Table(name = "orders")
 public class Order {
     @Id

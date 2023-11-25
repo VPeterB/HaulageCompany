@@ -3,19 +3,16 @@ package hu.bme.aut.haulagecompany.service;
 import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.LorrySite;
 import hu.bme.aut.haulagecompany.model.Vehicle;
-//import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.model.dto.LorrySiteDTO;
 import hu.bme.aut.haulagecompany.model.*;
 import hu.bme.aut.haulagecompany.model.dto.StackedGoodDTO;
 import hu.bme.aut.haulagecompany.repository.GoodRepository;
 import hu.bme.aut.haulagecompany.repository.LorrySiteRepository;
-//import hu.bme.aut.haulagecompany.repository.VehicleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-//import java.util.stream.StreamSupport;
 
 @Service
 public class LorrySiteService {
@@ -61,22 +58,6 @@ public class LorrySiteService {
             updatedLocation.setId(id);
             updatedLocation.setName(updatedLocationDTO.getName());
             updatedLocation.setAddress(updatedLocationDTO.getAddress());
-            /*List<Long> goodIDs = new ArrayList<>();
-            if(updatedLocationDTO.getGoodDTOs() != null) {
-                for (GoodDTO goodDTO : updatedLocationDTO.getGoodDTOs()) {
-                    goodIDs.add(goodDTO.getId());
-                }
-            }
-            List<Good> goods = StreamSupport.stream(goodRepository.findAllById(goodIDs).spliterator(), false).toList();
-            updatedLocation.setGoods(goods);
-            List<Long> vehicleIDs = new ArrayList<>();
-            if(updatedLocationDTO.getVehicleDTOs() != null) {
-                for (VehicleDTO vehicleDTO : updatedLocationDTO.getVehicleDTOs()) {
-                    goodIDs.add(vehicleDTO.getId());
-                }
-            }
-            List<Vehicle> vehicles = StreamSupport.stream(vehicleRepository.findAllById(vehicleIDs).spliterator(), false).toList();
-            updatedLocation.setVehicles(vehicles);*/
             LorrySite savedLocation = lorrySiteRepository.save(updatedLocation);
             return convertToDTO(savedLocation);
         } else {
