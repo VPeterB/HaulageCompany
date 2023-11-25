@@ -5,10 +5,13 @@ info:
   version: 2.0.0
 servers:
   - url: /api
+security:
+  - BearerAuth: [ ]
 paths:
   /users/register:
     post:
       summary: Register a new user
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -24,6 +27,7 @@ paths:
   /users/login:
     post:
       summary: Log in a user
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -45,6 +49,7 @@ paths:
   /users/checkName/{name}:
     get:
       summary: Check if a username exists
+      security: [ ]
       parameters:
         - in: path
           name: name
@@ -678,6 +683,12 @@ paths:
           description: Not Found
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     VehicleDTO:
       type: object
