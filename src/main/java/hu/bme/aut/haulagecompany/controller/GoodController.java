@@ -31,7 +31,7 @@ public class GoodController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GoodDTO> getGoodById(@PathVariable Long id) {
-        GoodDTO good = goodService.getGoodById(id);
+        GoodDTO good = goodService.getGoodDTOById(id);
         if (Objects.nonNull(good)) {
             return new ResponseEntity<>(good, HttpStatus.OK);
         } else {

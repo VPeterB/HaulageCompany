@@ -2,6 +2,7 @@ package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Good;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
+import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.repository.GoodRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class GoodService {
                 .toList();
     }
 
-    public GoodDTO getGoodById(Long id) {
+    public GoodDTO getGoodDTOById(Long id) {
         Optional<Good> good = goodRepository.findById(id);
         return good.map(this::convertToDTO).orElse(null);
     }
@@ -69,6 +70,13 @@ public class GoodService {
     }
 
     public List<Good> getGoodsByIds(List<Long> goodIDs) {
-        return StreamSupport.stream(goodRepository.findAllById(goodIDs).spliterator(), false).toList();
+        List<Optional<Good>> goodList = goodIDs.stream()
+                .map(goodRepository::findById)
+                .toList();
+        List<Good> realGoodList = new ArrayList<>();
+        for(Optional<Good> og : goodList){
+            og.ifPresent(realGoodList::add);
+        }
+        return realGoodList;
     }
 }
