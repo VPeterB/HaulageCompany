@@ -149,16 +149,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/GoodDTO'
 
-  /goods/{lorrySiteId}:
     post:
-      summary: Create a new good and add to lorry site
+      summary: Create a new good
       operationId: createGood
-      parameters:
-        - name: lorrySiteId
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         content:
           application/json:
@@ -316,6 +309,32 @@ paths:
       responses:
         '204':
           description: No Content
+        '404':
+          description: Not Found
+
+  /locations/{id}/addGood:
+    put:
+      summary: Add good to location
+      operationId: addGoodToLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StackedGoodDTO'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LorrySiteDTO'
         '404':
           description: Not Found
 
@@ -704,10 +723,10 @@ components:
           type: number
         lorrySiteID:
           type: integer
-        transportOperationDTOs:
+        transportOperationIDs:
           type: array
           items:
-            $ref: '#/components/schemas/TransportOperationDTO'
+            type: integer
 
     LorrySiteDTO:
       type: object
@@ -722,7 +741,7 @@ components:
         goodDTOs:
           type: array
           items:
-            $ref: '#/components/schemas/GoodDTO'
+            $ref: '#/components/schemas/GetStackedGoodDTO'
         vehicleDTOs:
           type: array
           items:
@@ -736,12 +755,12 @@ components:
         date:
           type: string
           format: timestamp
-        usedVehicleIDs:
+        usedVehicleDTOs:
           type: array
           items:
-            type: integer
-        orderID:
-          type: integer
+            $ref: '#/components/schemas/VehicleDTO'
+        orderDTO:
+          $ref: '#/components/schemas/GetOrderDTO'
 
     ShopDTO:
       type: object
@@ -766,10 +785,10 @@ components:
           nullable: true
         shopID:
           type: integer
-        goodIDs:
+        stackedGoodDTOs:
           type: array
           items:
-            type: integer
+            $ref: '#/components/schemas/StackedGoodDTO'
         transportOperationID:
           type: integer
           nullable: true
@@ -791,8 +810,6 @@ components:
         weight:
           type: number
           nullable: true
-        quantity:
-          type: integer
 
     GetOrderDTO:
       type: object
@@ -805,7 +822,7 @@ components:
         goodDTOs:
           type: array
           items:
-            $ref: '#/components/schemas/GoodDTO'
+            $ref: '#/components/schemas/GetStackedGoodDTO'
         transportOperationID:
           type: integer
           nullable: true
@@ -856,3 +873,19 @@ components:
           type: string
         password:
           type: string
+
+    StackedGoodDTO:
+      type: object
+      properties:
+        goodId:
+          type: integer
+        quantity:
+          type: integer
+
+    GetStackedGoodDTO:
+      type: object
+      properties:
+        goodDTO:
+          $ref: '#/components/schemas/GoodDTO'
+        quantity:
+          type: integer

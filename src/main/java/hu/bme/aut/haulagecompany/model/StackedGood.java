@@ -1,11 +1,16 @@
 package hu.bme.aut.haulagecompany.model;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-public class StackedGood extends Good{
+public class StackedGood {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private int quantity;
-    LorrySite lorrySite;
+    @ManyToOne
+    @JoinColumn(name = "good_id")
+    Good good;
 }
