@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Table(name = "orders")
 public class Order {
     @Id
@@ -24,12 +26,4 @@ public class Order {
 
     @OneToOne
     private TransportOperation transportOperation;
-
-    public List<Long> getGoodIds() {
-        List<Long> ids = new ArrayList<>();
-        for(Good g : this.goods){
-            ids.add(g.getId());
-        }
-        return ids;
-    }
 }

@@ -1,9 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
-import hu.bme.aut.haulagecompany.model.Good;
-import hu.bme.aut.haulagecompany.model.LorrySite;
-import hu.bme.aut.haulagecompany.model.TransportOperation;
-import hu.bme.aut.haulagecompany.model.Vehicle;
+import hu.bme.aut.haulagecompany.model.*;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
 import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import org.modelmapper.ModelMapper;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.ToDoubleFunction;
 
 @Service
 public class TransportOperationService {
@@ -38,16 +36,39 @@ public class TransportOperationService {
 
     public TransportOperationDTO createTransportOperation(TransportOperationDTO transportOperationDTO) {
         TransportOperation transportOperation = convertToEntity(transportOperationDTO);
-        if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO)){
+        if(transportOperationRepository.findByOrderId(transportOperationDTO.getOrderID()).isPresent()){
+            return null;
+        }
+        if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO) && checkVehicleSizesAreGood(transportOperationDTO)){
             return null;
         }
         transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs()));
         transportOperation.setOrder(orderService.getOrderById(transportOperationDTO.getOrderID()));
         TransportOperation createdTransportOperation = transportOperationRepository.save(transportOperation);
 
+
         var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
-        lorrySiteService.removeGoods(vehicles.get(1).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
+        lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
         return convertToDTO(createdTransportOperation);
+    }
+
+    private boolean checkVehicleSizesAreGood(TransportOperationDTO transportOperationDTO) {
+        List<Vehicle> vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
+        double summedVehicleSize = sumAttribute(vehicles, Vehicle::getSize);
+        double summedVehicleMaxWeight = sumAttribute(vehicles, Vehicle::getMaxWeight);
+
+        Order order = orderService.getOrderById(transportOperationDTO.getOrderID());
+        List<Good> orderedGoods = order.getGoods();
+        double summedOrderedGoodsSize = sumAttribute(orderedGoods, Good::getSize);
+        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, Good::getWeight);
+
+        return (summedOrderedGoodsSize <= summedVehicleSize) && (summedOrderedGoodsWeight <= summedVehicleMaxWeight);
+    }
+
+    private <T> double sumAttribute(List<T> items, ToDoubleFunction<T> attributeExtractor) {
+        return items.stream()
+                .mapToDouble(attributeExtractor)
+                .sum();
     }
 
     private boolean checkGoodsAvailable(TransportOperationDTO transportOperationDTO) {
@@ -57,7 +78,7 @@ public class TransportOperationService {
         vehicles.forEach(v -> lorrySites.add(v.getLocation()));
         var lorrySiteGoods = new ArrayList<Good>();
         lorrySites.forEach(l -> lorrySiteGoods.addAll(l.getGoods()));
-        var summedGoods = aggregateGoods(lorrySiteGoods);
+        var summedGoods = lorrySiteService.aggregateGoods(lorrySiteGoods, true);
         var orderedGoods = order.getGoods();
         AtomicBoolean res = new AtomicBoolean(true);
         orderedGoods.forEach(og -> summedGoods.forEach(g -> {
@@ -67,24 +88,6 @@ public class TransportOperationService {
             }
         }));
         return res.get();
-    }
-
-    private List<Good> aggregateGoods(ArrayList<Good> goods) {
-        Map<String, Good> aggregatedGoods = new HashMap<>();
-        for (Good good : goods) {
-            String key = getKey(good);
-            if (aggregatedGoods.containsKey(key)) {
-                Good existingGood = aggregatedGoods.get(key);
-                existingGood.setQuantity(existingGood.getQuantity() + good.getQuantity());
-            } else {
-                aggregatedGoods.put(key, good);
-            }
-        }
-        return new ArrayList<>(aggregatedGoods.values());
-    }
-
-    private String getKey(Good good) {
-        return good.getName() + "_" + good.getSize() + "_" + good.getWeight();
     }
 
     private boolean checkVehicleAvailable(Timestamp date, List<Long> usedVehicleIDs) {

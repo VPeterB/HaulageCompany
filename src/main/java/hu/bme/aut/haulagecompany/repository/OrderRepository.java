@@ -5,6 +5,4 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderRepository extends CrudRepository<Order, Long> {
-    // Custom queries can be added here if needed
-}
+public interface OrderRepository extends CrudRepository<Order, Long> {}

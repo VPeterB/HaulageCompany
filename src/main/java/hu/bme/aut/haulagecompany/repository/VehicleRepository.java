@@ -9,5 +9,4 @@ import java.util.Optional;
 @Repository
 public interface VehicleRepository extends CrudRepository<Vehicle, Long> {
     Optional<Vehicle> findByLicensePlate(String licensePlate);
-
 }

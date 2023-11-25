@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.TransportOperation;
 import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.model.Vehicle;
 import hu.bme.aut.haulagecompany.repository.VehicleRepository;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -45,7 +45,7 @@ public class VehicleService {
         List<Vehicle> vehicles = (List<Vehicle>) vehicleRepository.findAll();
         return vehicles.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public VehicleDTO getVehicleById(Long id) {
@@ -57,10 +57,11 @@ public class VehicleService {
         Optional<Vehicle> existingVehicle = vehicleRepository.findById(id);
 
         if (existingVehicle.isPresent()) {
-            Vehicle updatedVehicle = convertToEntity(updatedVehicleDTO);
-            updatedVehicle.setId(id);
+            Vehicle updatedVehicle = existingVehicle.get();
+            updatedVehicle.setLicensePlate(updatedVehicleDTO.getLicensePlate());
+            updatedVehicle.setSize(updatedVehicleDTO.getSize());
+            updatedVehicle.setMaxWeight(updatedVehicleDTO.getMaxWeight());
             updatedVehicle.setLocation(lorrySiteService.findById(updatedVehicleDTO.getLorrySiteID()).orElse(existingVehicle.get().getLocation()));
-            updatedVehicle.setTransportOperations(existingVehicle.get().getTransportOperations());
             Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
             return convertToDTO(savedVehicle);
         } else {

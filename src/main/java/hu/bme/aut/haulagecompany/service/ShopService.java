@@ -1,5 +1,6 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.Order;
 import hu.bme.aut.haulagecompany.model.Shop;
 import hu.bme.aut.haulagecompany.model.dto.ShopDTO;
 import hu.bme.aut.haulagecompany.repository.ShopRepository;
@@ -68,11 +69,12 @@ public class ShopService {
         shopRepository.deleteById(id);
     }
 
-    private ShopDTO convertToDTO(Shop shop) {
+    public ShopDTO convertToDTO(Shop shop) {
         return modelMapper.map(shop, ShopDTO.class);
     }
 
     private Shop convertToEntity(ShopDTO shopDTO) {
         return modelMapper.map(shopDTO, Shop.class);
     }
+
 }

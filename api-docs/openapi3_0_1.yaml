@@ -5,7 +5,136 @@ info:
   version: 2.0.0
 servers:
   - url: /api
+security:
+  - BearerAuth: [ ]
 paths:
+  /users/register:
+    post:
+      summary: Register a new user
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegDTO'
+      responses:
+        '200':
+          description: Successful registration
+        '400':
+          description: Invalid request
+
+  /users/login:
+    post:
+      summary: Log in a user
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginDTO'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDTO'
+        '401':
+          description: Unauthorized
+        '400':
+          description: Invalid request
+
+  /users/checkName/{name}:
+    get:
+      summary: Check if a username exists
+      security: [ ]
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+
+  /users/all:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDTO'
+
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '404':
+          description: User not found
+
+    delete:
+      summary: Delete user by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User deleted
+        '404':
+          description: User not found
+
+    put:
+      summary: Update user roles by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        '200':
+          description: User roles updated
+        '404':
+          description: User not found
+
   /goods:
     get:
       summary: Get all goods
@@ -20,16 +149,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/GoodDTO'
 
-  /goods/{lorrySiteId}:
     post:
-      summary: Create a new good and add to lorry site
+      summary: Create a new good
       operationId: createGood
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         content:
           application/json:
@@ -190,11 +312,39 @@ paths:
         '404':
           description: Not Found
 
-  /purchases:
-    post:
-      summary: Create a new purchase
-      operationId: createPurchase
+  /locations/{id}/addGood:
+    put:
+      summary: Add good to location
+      operationId: addGoodToLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StackedGoodDTO'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LorrySiteDTO'
+        '404':
+          description: Not Found
+
+  /orders:
+    post:
+      summary: Create a new order
+      operationId: createOrder
+      requestBody:
+        description: Order data
+        required: true
         content:
           application/json:
             schema:
@@ -205,10 +355,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
+
     get:
-      summary: Get all purchases
-      operationId: getAllPurchases
+      summary: Get all orders
+      operationId: getAllOrders
       responses:
         '200':
           description: OK
@@ -217,12 +368,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderDTO'
+                  $ref: '#/components/schemas/GetOrderDTO'
 
-  /purchases/{id}:
+  /orders/{id}:
     get:
-      summary: Get a purchase by ID
-      operationId: getPurchaseById
+      summary: Get an order by ID
+      operationId: getOrderById
       parameters:
         - name: id
           in: path
@@ -235,13 +386,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
         '404':
           description: Not Found
 
     put:
-      summary: Update a purchase by ID
-      operationId: updatePurchase
+      summary: Update an order by ID
+      operationId: updateOrder
       parameters:
         - name: id
           in: path
@@ -249,6 +400,8 @@ paths:
           schema:
             type: integer
       requestBody:
+        description: Order data
+        required: true
         content:
           application/json:
             schema:
@@ -259,13 +412,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
+                $ref: '#/components/schemas/GetOrderDTO'
         '404':
           description: Not Found
 
     delete:
-      summary: Delete a purchase by ID
-      operationId: deletePurchase
+      summary: Delete an order by ID
+      operationId: deleteOrder
       parameters:
         - name: id
           in: path
@@ -376,6 +529,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TransportOperationDTO'
       responses:
+        '409':
+          description: Conflict
         '201':
           description: Created
           content:
@@ -464,6 +619,10 @@ paths:
             schema:
               $ref: '#/components/schemas/VehicleDTO'
       responses:
+        '409':
+          description: Conflict
+        '404':
+          description: Not Found
         '201':
           description: Created
           content:
@@ -543,96 +702,13 @@ paths:
           description: Not Found
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
-    GoodDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        name:
-          type: string
-        description:
-          type: string
-          nullable: true
-        size:
-          type: number
-          nullable: true
-        weight:
-          type: number
-          nullable: true
-        quantity:
-          type: integer
-
-    LorrySiteDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        name:
-          type: string
-        address:
-          type: string
-        goodIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-        vehicleIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-
-    OrderDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        shopID:
-          type: integer
-        goodIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-        transportOperationID:
-          type: integer
-          nullable: true
-
-    ShopDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          nullable: true
-        name:
-          type: string
-        address:
-          type: string
-        orderIDs:
-          type: array
-          items:
-            type: integer
-          nullable: true
-
-    TransportOperationDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-        date:
-          type: string
-          format: date-time
-        usedVehicleIDs:
-          type: array
-          items:
-            type: integer
-        orderID:
-          type: integer
-
     VehicleDTO:
       type: object
       properties:
@@ -651,4 +727,165 @@ components:
           type: array
           items:
             type: integer
+
+    LorrySiteDTO:
+      type: object
+      properties:
+        id:
+          type: integer
           nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        goodDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetStackedGoodDTO'
+        vehicleDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleDTO'
+
+    TransportOperationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: timestamp
+        usedVehicleDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleDTO'
+        orderDTO:
+          $ref: '#/components/schemas/GetOrderDTO'
+
+    ShopDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        address:
+          type: string
+        orderIDs:
+          type: array
+          items:
+            type: integer
+
+    OrderDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        shopID:
+          type: integer
+        stackedGoodDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/StackedGoodDTO'
+        transportOperationID:
+          type: integer
+          nullable: true
+
+    GoodDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        size:
+          type: number
+          nullable: true
+        weight:
+          type: number
+          nullable: true
+
+    GetOrderDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        shopDTO:
+          $ref: '#/components/schemas/ShopDTO'
+        goodDTOs:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetStackedGoodDTO'
+        transportOperationID:
+          type: integer
+          nullable: true
+
+    AuthResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        accessToken:
+          type: string
+
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        username:
+          type: string
+        entryDate:
+          type: string
+          format: date-time
+        roles:
+          type: array
+          items:
+            type: string
+
+    UserRegDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+
+    UserLoginDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    StackedGoodDTO:
+      type: object
+      properties:
+        goodId:
+          type: integer
+        quantity:
+          type: integer
+
+    GetStackedGoodDTO:
+      type: object
+      properties:
+        goodDTO:
+          $ref: '#/components/schemas/GoodDTO'
+        quantity:
+          type: integer

@@ -13,5 +13,5 @@ public class LorrySiteDTO {
     @Nullable
     private List<GetStackedGoodDTO> goodDTOs;
     @Nullable
-    private List<Long> vehicleIDs;
+    private List<VehicleDTO> vehicleDTOs;
 }

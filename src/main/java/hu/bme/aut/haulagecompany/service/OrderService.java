@@ -1,12 +1,15 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.Order;
+import hu.bme.aut.haulagecompany.model.TransportOperation;
+import hu.bme.aut.haulagecompany.model.dto.GetOrderDTO;
 import hu.bme.aut.haulagecompany.model.dto.OrderDTO;
 import hu.bme.aut.haulagecompany.repository.OrderRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,28 +32,38 @@ public class OrderService {
         this.goodService = goodService;
     }
 
-    public OrderDTO createPurchase(OrderDTO orderDTO) {
+    public GetOrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
-        order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
-
+        if(orderDTO.getGoodIDs() == null){
+            order.setGoods(new ArrayList<>());
+        }else if (orderDTO.getGoodIDs().isEmpty()){
+            order.setGoods(new ArrayList<>());
+        }else {
+            order.setGoods(goodService.getGoodsByIds(orderDTO.getGoodIDs()));
+        }
         Order createdOrder = orderRepository.save(order);
-        return convertToDTO(createdOrder);
+        return convertToGetDTO(createdOrder);
     }
 
-    public List<OrderDTO> getAllPurchases() {
-        List<Order> orders = (List<Order>) orderRepository.findAll();
-        return orders.stream()
-                .map(this::convertToDTO)
+    private GetOrderDTO convertToGetDTO(Order createdOrder) {
+        GetOrderDTO newDTO = modelMapper.map(createdOrder, GetOrderDTO.class);
+        newDTO.setShopDTO(shopService.convertToDTO(createdOrder.getShop()));
+        return newDTO;
+    }
+
+    public List<GetOrderDTO> getAllOrders() {
+        return StreamSupport.stream(orderRepository.findAll().spliterator(), false)
+                .map(this::convertToGetDTO)
                 .toList();
     }
 
-    public OrderDTO getPurchaseById(Long id) {
+    public GetOrderDTO getOrderDTOById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
-        return order.map(this::convertToDTO).orElse(null);
+        return order.map(this::convertToGetDTO).orElse(null);
     }
 
-    public OrderDTO updatePurchase(Long id, OrderDTO updatedOrderDTO) {
+    public GetOrderDTO updateOrder(Long id, OrderDTO updatedOrderDTO) {
         Optional<Order> existingOrder = orderRepository.findById(id);
 
         if (existingOrder.isPresent()) {
@@ -60,18 +73,14 @@ public class OrderService {
             updatedOrder.setGoods(goodService.getGoodsByIds(updatedOrderDTO.getGoodIDs()));
 
             Order savedOrder = orderRepository.save(updatedOrder);
-            return convertToDTO(savedOrder);
+            return convertToGetDTO(savedOrder);
         } else {
             return null;
         }
     }
 
-    public void deletePurchase(Long id) {
+    public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
-    }
-
-    private OrderDTO convertToDTO(Order order) {
-        return modelMapper.map(order, OrderDTO.class);
     }
 
     private Order convertToEntity(OrderDTO orderDTO) {

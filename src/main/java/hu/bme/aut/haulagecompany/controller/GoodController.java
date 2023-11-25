@@ -3,7 +3,6 @@ package hu.bme.aut.haulagecompany.controller;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.service.GoodService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +31,7 @@ public class GoodController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GoodDTO> getGoodById(@PathVariable Long id) {
-        GoodDTO good = goodService.getGoodById(id);
+        GoodDTO good = goodService.getGoodDTOById(id);
         if (Objects.nonNull(good)) {
             return new ResponseEntity<>(good, HttpStatus.OK);
         } else {
