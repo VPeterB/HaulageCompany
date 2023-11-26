@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Entity
 public class Shop extends Location{
-    @OneToMany(mappedBy="shop")
+    @OneToMany(fetch = jakarta.persistence.FetchType.EAGER, mappedBy = "shop")
     @ToString.Exclude
     private List<Order> orders;
 

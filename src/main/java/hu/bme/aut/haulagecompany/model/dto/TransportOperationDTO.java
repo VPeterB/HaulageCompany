@@ -10,5 +10,5 @@ public class TransportOperationDTO {
     private Long id;
     private Timestamp date;
     private List<VehicleDTO> usedVehicleDTOs;
-    private OrderDTO orderDTO;
+    private GetOrderDTO orderDTO;
 }
