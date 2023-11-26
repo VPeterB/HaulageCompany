@@ -19,6 +19,9 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<GetOrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         GetOrderDTO createdOrder = orderService.createOrder(orderDTO);
+        if(createdOrder == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 

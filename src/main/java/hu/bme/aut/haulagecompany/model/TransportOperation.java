@@ -18,7 +18,7 @@ public class TransportOperation {
     private Timestamp date;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Vehicle> usedVehicles;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @Nullable
     private Order order;
 }

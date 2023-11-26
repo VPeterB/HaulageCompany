@@ -97,4 +97,13 @@ public class VehicleService {
             }
         }
     }
+
+    public void removeTransportOperation(Vehicle v, Optional<TransportOperation> to) {
+        Optional<Vehicle> veh = vehicleRepository.findById(v.getId());
+        if(veh.isPresent()){
+            Vehicle realVehicle = veh.get();
+            List<TransportOperation> toList = realVehicle.getTransportOperations();
+            toList.remove(to.orElse(null));
+        }
+    }
 }
