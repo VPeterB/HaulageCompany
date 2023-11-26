@@ -1,13 +1,15 @@
 package hu.bme.aut.haulagecompany.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Table(name = "orders")
 public class Order {
     @Id
@@ -17,10 +19,10 @@ public class Order {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order")
     @ToString.Exclude
     private List<OrderedGood> goods;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     private TransportOperation transportOperation;
 }

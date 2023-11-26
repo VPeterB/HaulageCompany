@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
 
 @Service
@@ -46,7 +47,7 @@ public class TransportOperationService {
             usedVehicleIDs.add(uv.getId());
         }
 
-        if(!checkVehicleAvailable(transportOperationDTO.getDate(), usedVehicleIDs) && !checkGoodsAvailable(usedVehicleIDs, transportOperationDTO) && checkVehicleSizesAreGood(usedVehicleIDs, transportOperationDTO)){
+        if(!checkVehicleAvailable(transportOperationDTO.getDate(), usedVehicleIDs) || !checkGoodsAvailable(usedVehicleIDs, transportOperationDTO) || !checkVehicleSizesAreGood(usedVehicleIDs, transportOperationDTO)){
             return null;
         }
 
@@ -69,9 +70,10 @@ public class TransportOperationService {
 
         Order order = orderService.getOrderById(transportOperationDTO.getOrderDTO().getId());
         List<OrderedGood> orderedGoods = order.getGoods();
-        double summedOrderedGoodsSize = sumAttribute(orderedGoods, og -> og.getGood().getSize());
-        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, og -> og.getGood().getWeight());
-
+        AtomicInteger db = new AtomicInteger();
+        orderedGoods.forEach(g -> db.set(db.get() + g.getQuantity()));
+        double summedOrderedGoodsSize = sumAttribute(orderedGoods, og -> og.getGood().getSize()) * db.get();
+        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, og -> og.getGood().getWeight() * db.get());
         return (summedOrderedGoodsSize <= summedVehicleSize) && (summedOrderedGoodsWeight <= summedVehicleMaxWeight);
     }
 
@@ -82,16 +84,15 @@ public class TransportOperationService {
     }
 
     private boolean checkGoodsAvailable(List<Long> usedVehicleIDs, TransportOperationDTO transportOperationDTO) {
-        var order = orderService.getOrderById(transportOperationDTO.getOrderDTO().getId());
-        var vehicles = vehicleService.getVehiclesByIds(usedVehicleIDs);
-        var lorrySites = new ArrayList<LorrySite>();
-        vehicles.forEach(v -> lorrySites.add(v.getLocation()));
-        var lorrySiteGoods = new ArrayList<InventoryGood>();
+        Order order = orderService.getOrderById(transportOperationDTO.getOrderDTO().getId());
+        List<Vehicle> vehicles = vehicleService.getVehiclesByIds(usedVehicleIDs);
+        List<LorrySite> lorrySites = new ArrayList<>();
+        vehicles.forEach(v -> lorrySites.add(lorrySiteService.findById(v.getLocation().getId()).orElse(v.getLocation())));
+        List<InventoryGood> lorrySiteGoods = new ArrayList<>();
         lorrySites.forEach(l -> lorrySiteGoods.addAll(l.getGoods()));
-        var summedGoods = lorrySiteService.aggregateGoods(lorrySiteGoods, true);
-        var orderedGoods = order.getGoods();
+        List<OrderedGood> orderedGoods = order.getGoods();
         AtomicBoolean res = new AtomicBoolean(true);
-        orderedGoods.forEach(og -> summedGoods.forEach(g -> {
+        orderedGoods.forEach(og -> lorrySiteGoods.forEach(g -> {
             if(Objects.equals(og.getGood().getName(), g.getGood().getName()) && Objects.equals(og.getGood().getSize(), g.getGood().getSize()) && Objects.equals(og.getGood().getWeight(), g.getGood().getWeight())
                     && og.getQuantity() > g.getQuantity()){
                 res.set(false);
@@ -151,11 +152,19 @@ public class TransportOperationService {
         var tO = transportOperationRepository.findById(id);
         if(tO.isPresent()){
             var realTO = tO.get();
-            var lSId = realTO.getUsedVehicles().get(1).getLocation().getId();
-            assert realTO.getOrder() != null;
-            for(OrderedGood g : realTO.getOrder().getGoods()){
-                lorrySiteService.addGood(lSId, convertToStackedGoodDTO(g));
+            var lSId = realTO.getUsedVehicles().get(0).getLocation().getId();
+            if(realTO.getOrder() != null){
+                for(OrderedGood g : realTO.getOrder().getGoods()){
+                    lorrySiteService.addGood(lSId, convertToStackedGoodDTO(g));
+                }
+                Order o = realTO.getOrder();
+                orderService.removeTransportOperation(o);
             }
+            List<Vehicle> vl = realTO.getUsedVehicles();
+            for(var v : vl){
+                vehicleService.removeTransportOperation(v, tO);
+            }
+            realTO.setUsedVehicles(null);
         }
         transportOperationRepository.deleteById(id);
     }

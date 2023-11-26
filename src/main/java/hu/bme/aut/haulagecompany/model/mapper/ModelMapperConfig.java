@@ -19,7 +19,7 @@ public class ModelMapperConfig {
 
         mm.typeMap(Vehicle.class, VehicleDTO.class).addMappings(mapper -> {
             mapper.map(src -> src.getLocation().getId(), VehicleDTO::setLorrySiteID);
-            mapper.map(src -> mapTransportOperationsToTransportOperationDTOs(src.getTransportOperations(), mm), VehicleDTO::setTransportOperationDTOs);
+            mapper.map(Vehicle::getTOIDs, VehicleDTO::setTransportOperationIDs);
         });
 
         mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> mapper.map(src -> mapVehiclesToVehicleDTOs(src.getUsedVehicles(), mm), TransportOperationDTO::setUsedVehicleDTOs));
@@ -41,15 +41,6 @@ public class ModelMapperConfig {
         if(vehicles != null){
             return vehicles.stream()
                     .map(vehicle -> mm.map(vehicle, VehicleDTO.class))
-                    .toList();
-        }
-        return new ArrayList<>();
-    }
-
-    private List<TransportOperationDTO> mapTransportOperationsToTransportOperationDTOs(List<TransportOperation> transportOperations, ModelMapper mm) {
-        if(transportOperations != null){
-            return transportOperations.stream()
-                    .map(to -> mm.map(to, TransportOperationDTO.class))
                     .toList();
         }
         return new ArrayList<>();

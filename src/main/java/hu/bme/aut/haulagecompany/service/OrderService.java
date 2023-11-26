@@ -20,6 +20,7 @@ public class OrderService {
     private final ShopService shopService;
     private final GoodService goodService;
     private final TransportOperationRepository transportOperationRepository;
+    private final VehicleService vehicleService;
 
     @Autowired
     public OrderService(
@@ -28,23 +29,31 @@ public class OrderService {
             ShopService shopService,
             GoodService goodService,
             ModelMapper modelMapper,
-            TransportOperationRepository transportOperationRepository) {
+            TransportOperationRepository transportOperationRepository,
+            VehicleService vehicleService) {
         this.orderedGoodRepository = orderedGoodRepository;
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.shopService = shopService;
         this.goodService = goodService;
         this.transportOperationRepository = transportOperationRepository;
+        this.vehicleService = vehicleService;
     }
 
     public GetOrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
+        if(orderDTO.getShopID() == null){
+            return null;
+        }
         order.setShop(shopService.getShopById(orderDTO.getShopID()));
+        if(order.getShop() == null){
+            return null;
+        }
         Order createdOrder = orderRepository.save(order);
         if(orderDTO.getStackedGoodDTOs() == null){
-            createdOrder.setGoods(new ArrayList<>());
+            return null;
         }else if (orderDTO.getStackedGoodDTOs().isEmpty()){
-            createdOrder.setGoods(new ArrayList<>());
+            return null;
         }else {
             Long orderId = createdOrder.getId();
             List<OrderedGood> goodList = new ArrayList<>();
@@ -146,16 +155,36 @@ public class OrderService {
             Order updatedOrder = existingOrder.get();
             updatedOrder.setId(id);
             updatedOrder.setShop(shopService.getShopById(updatedOrderDTO.getShopID()));
+            if(updatedOrderDTO.getStackedGoodDTOs() != null && !updatedOrderDTO.getStackedGoodDTOs().isEmpty()){
+                List<OrderedGood> goodList = updatedOrder.getGoods();
+                updatedOrder.setGoods(new ArrayList<>());
+                orderedGoodRepository.deleteAll(goodList);
+            }
             Order savedOrder = orderRepository.save(updatedOrder);
             if(updatedOrderDTO.getStackedGoodDTOs() != null && !updatedOrderDTO.getStackedGoodDTOs().isEmpty()){
                 Long orderId = savedOrder.getId();
-                List<OrderedGood> goodList = new ArrayList<>();
+                List<OrderedGood> goodList = savedOrder.getGoods();
+                goodList.removeAll(savedOrder.getGoods());
                 for(StackedGoodDTO g : updatedOrderDTO.getStackedGoodDTOs()){
                     goodList.add(convertToOrderedGood(orderId, g));
                 }
                 List<OrderedGood> aggGoodList = aggregateGoods(goodList, true);
                 List<OrderedGood> savedAggGoodList = saveGoods(aggGoodList);
                 savedOrder.setGoods(savedAggGoodList);
+                if(savedOrder.getTransportOperation() != null){
+                    Long toid = savedOrder.getTransportOperation().getId();
+                    savedOrder.setTransportOperation(null);
+                    orderRepository.save(savedOrder);
+                    var to = transportOperationRepository.findById(toid);
+                    if(to.isPresent()){
+                        List<Vehicle> vl = to.get().getUsedVehicles();
+                        for(var v : vl){
+                            vehicleService.removeTransportOperation(v, to);
+                        }
+                        to.get().setUsedVehicles(null);
+                    }
+                    transportOperationRepository.deleteById(toid);
+                }
             }
             Order newCreatedOrder = orderRepository.save(savedOrder);
             return convertToGetDTO(newCreatedOrder);
@@ -173,9 +202,21 @@ public class OrderService {
             orderedGoodRepository.deleteAll(ogList);
             realO.setGoods(null);
             realO.setShop(null);
-            Long toid = realO.getTransportOperation().getId();
+            if(realO.getTransportOperation() != null){
+                Long toid = realO.getTransportOperation().getId();
+                realO.setTransportOperation(null);
+                orderRepository.save(realO);
+                var to = transportOperationRepository.findById(toid);
+                if(to.isPresent()){
+                    List<Vehicle> vl = to.get().getUsedVehicles();
+                    for(var v : vl){
+                        vehicleService.removeTransportOperation(v, to);
+                    }
+                    to.get().setUsedVehicles(null);
+                }
+                transportOperationRepository.deleteById(toid);
+            }
             realO.setTransportOperation(null);
-            transportOperationRepository.deleteById(toid);
             orderRepository.save(realO);
         }
         orderRepository.deleteById(id);
@@ -195,6 +236,17 @@ public class OrderService {
         if(o != null){
             o.setTransportOperation(createdTransportOperation);
             orderRepository.save(o);
+        }
+    }
+
+    public void removeTransportOperation(Order o) {
+        if(o != null){
+            Optional<Order> order = orderRepository.findById(o.getId());
+            if(order.isPresent()){
+                Order realO = order.get();
+                realO.setTransportOperation(null);
+                orderRepository.save(realO);
+            }
         }
     }
 }

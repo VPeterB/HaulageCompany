@@ -14,5 +14,5 @@ public class VehicleDTO {
     private Double maxWeight;
     private Long lorrySiteID;
     @Nullable
-    private List<TransportOperationDTO> transportOperationDTOs;
+    private List<Long> transportOperationIDs;
 }
