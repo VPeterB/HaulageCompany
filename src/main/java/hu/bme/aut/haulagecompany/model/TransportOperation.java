@@ -16,17 +16,9 @@ public class TransportOperation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Timestamp date;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Vehicle> usedVehicles;
     @OneToOne
     @Nullable
     private Order order;
-
-    public List<Long> getUsedVehicleIds() {
-        List<Long> ids = new ArrayList<>();
-        for(Vehicle v : this.usedVehicles){
-            ids.add(v.getId());
-        }
-        return ids;
-    }
 }

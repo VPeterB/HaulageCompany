@@ -18,6 +18,6 @@ public class Vehicle {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private LorrySite location;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<TransportOperation> transportOperations;
 }

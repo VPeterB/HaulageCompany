@@ -9,6 +9,6 @@ import java.util.List;
 public class TransportOperationDTO {
     private Long id;
     private Timestamp date;
-    private List<Long> usedVehicleIDs;
-    private Long orderID;
+    private List<VehicleDTO> usedVehicleDTOs;
+    private GetOrderDTO orderDTO;
 }

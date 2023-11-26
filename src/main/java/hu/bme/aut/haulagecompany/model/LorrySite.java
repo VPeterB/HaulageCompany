@@ -9,8 +9,9 @@ import java.util.List;
 @Data
 @Entity
 public class LorrySite extends Location{
-    @OneToMany(mappedBy="location")
+    @OneToMany(fetch = jakarta.persistence.FetchType.EAGER, mappedBy = "location")
     private List<Vehicle> vehicles;
-    @OneToMany
-    private List<Good> goods;
+
+    @OneToMany(fetch = jakarta.persistence.FetchType.EAGER, mappedBy = "lorrySite")
+    private List<InventoryGood> goods;
 }

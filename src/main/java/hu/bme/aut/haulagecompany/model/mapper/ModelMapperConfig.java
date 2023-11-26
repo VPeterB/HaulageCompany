@@ -22,19 +22,20 @@ public class ModelMapperConfig {
             mapper.map(src -> mapTransportOperationsToTransportOperationDTOs(src.getTransportOperations(), mm), VehicleDTO::setTransportOperationDTOs);
         });
 
-        mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> mapper.map(TransportOperation::getUsedVehicleIds, TransportOperationDTO::setUsedVehicleIDs));
+        mm.typeMap(TransportOperation.class, TransportOperationDTO.class).addMappings(mapper-> mapper.map(src -> mapVehiclesToVehicleDTOs(src.getUsedVehicles(), mm), TransportOperationDTO::setUsedVehicleDTOs));
 
         mm.typeMap(Shop.class, ShopDTO.class).addMappings(mapper-> mapper.map(Shop::getOrderIDs, ShopDTO::setOrderIDs));
 
-        mm.typeMap(Order.class, GetOrderDTO.class).addMappings(mapper -> mapper.map(src -> mapGoodsToGoodDTOs(src.getGoods(), mm), GetOrderDTO::setGoodDTOs));
+        mm.typeMap(Order.class, GetOrderDTO.class).addMappings(mapper -> mapper.map(src -> mapOrderedGoodsToStackedGoodDTOs(src.getGoods(), mm), GetOrderDTO::setGoodDTOs));
 
         mm.typeMap(LorrySite.class, LorrySiteDTO.class).addMappings(mapper -> {
             mapper.map(src -> mapVehiclesToVehicleDTOs(src.getVehicles(), mm), LorrySiteDTO::setVehicleDTOs);
-            mapper.map(src -> mapGoodsToGoodDTOs(src.getGoods(), mm), LorrySiteDTO::setGoodDTOs);
+            mapper.map(src -> mapInventoryGoodsToStackedGoodDTOs(src.getGoods(), mm), LorrySiteDTO::setGoodDTOs);
         });
 
         return mm;
     }
+
 
     private List<VehicleDTO> mapVehiclesToVehicleDTOs(List<Vehicle> vehicles, ModelMapper mm) {
         if(vehicles != null){
@@ -54,10 +55,19 @@ public class ModelMapperConfig {
         return new ArrayList<>();
     }
 
-    private List<GoodDTO> mapGoodsToGoodDTOs(List<Good> goods, ModelMapper mm) {
+    private List<StackedGoodDTO> mapInventoryGoodsToStackedGoodDTOs(List<InventoryGood> goods, ModelMapper mm) {
         if(goods != null){
             return goods.stream()
-                    .map(good -> mm.map(good, GoodDTO.class))
+                    .map(good -> mm.map(good, StackedGoodDTO.class))
+                    .toList();
+        }
+        return new ArrayList<>();
+    }
+
+    private List<StackedGoodDTO> mapOrderedGoodsToStackedGoodDTOs(List<OrderedGood> goods, ModelMapper mm) {
+        if(goods != null){
+            return goods.stream()
+                    .map(good -> mm.map(good, StackedGoodDTO.class))
                     .toList();
         }
         return new ArrayList<>();

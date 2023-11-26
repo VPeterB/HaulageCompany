@@ -77,4 +77,15 @@ public class ShopService {
         return modelMapper.map(shopDTO, Shop.class);
     }
 
+    public void removeOrder(Order realO) {
+        Optional<Shop> shop = shopRepository.findById(realO.getShop().getId());
+        if(shop.isPresent()){
+            Shop realShop = shop.get();
+            List<Order> shopOrderList = realShop.getOrders();
+            shopOrderList.remove(realO);
+            realShop.setOrders(shopOrderList);
+            shopRepository.save(realShop);
+        }
+
+    }
 }

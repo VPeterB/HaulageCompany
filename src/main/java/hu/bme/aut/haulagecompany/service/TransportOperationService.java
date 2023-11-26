@@ -1,6 +1,7 @@
 package hu.bme.aut.haulagecompany.service;
 
 import hu.bme.aut.haulagecompany.model.*;
+import hu.bme.aut.haulagecompany.model.dto.StackedGoodDTO;
 import hu.bme.aut.haulagecompany.model.dto.TransportOperationDTO;
 import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import org.modelmapper.ModelMapper;
@@ -36,31 +37,40 @@ public class TransportOperationService {
 
     public TransportOperationDTO createTransportOperation(TransportOperationDTO transportOperationDTO) {
         TransportOperation transportOperation = convertToEntity(transportOperationDTO);
-        if(transportOperationRepository.findByOrderId(transportOperationDTO.getOrderID()).isPresent()){
+        if(transportOperationRepository.findByOrderId(transportOperationDTO.getOrderDTO().getId()).isPresent()){
             return null;
         }
-        if(!checkVehicleAvailable(transportOperationDTO.getDate(), transportOperationDTO.getUsedVehicleIDs()) && !checkGoodsAvailable(transportOperationDTO) && checkVehicleSizesAreGood(transportOperationDTO)){
+
+        List<Long> usedVehicleIDs = new ArrayList<>();
+        for (var uv : transportOperationDTO.getUsedVehicleDTOs()){
+            usedVehicleIDs.add(uv.getId());
+        }
+
+        if(!checkVehicleAvailable(transportOperationDTO.getDate(), usedVehicleIDs) && !checkGoodsAvailable(usedVehicleIDs, transportOperationDTO) && checkVehicleSizesAreGood(usedVehicleIDs, transportOperationDTO)){
             return null;
         }
-        transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs()));
-        transportOperation.setOrder(orderService.getOrderById(transportOperationDTO.getOrderID()));
+
+        transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(usedVehicleIDs));
+        transportOperation.setOrder(orderService.getOrderById(transportOperationDTO.getOrderDTO().getId()));
         TransportOperation createdTransportOperation = transportOperationRepository.save(transportOperation);
 
+        orderService.setTransportOperation(createdTransportOperation);
 
-        var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
-        lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderID()).getGoods());
+        var vehicles = vehicleService.getVehiclesByIds(usedVehicleIDs);
+        vehicleService.addTransportOperation(vehicles, createdTransportOperation);
+        lorrySiteService.removeGoods(vehicles.get(0).getLocation(), orderService.getOrderById(transportOperationDTO.getOrderDTO().getId()).getGoods());
         return convertToDTO(createdTransportOperation);
     }
 
-    private boolean checkVehicleSizesAreGood(TransportOperationDTO transportOperationDTO) {
-        List<Vehicle> vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
+    private boolean checkVehicleSizesAreGood(List<Long> usedVehicleIDs, TransportOperationDTO transportOperationDTO) {
+        List<Vehicle> vehicles = vehicleService.getVehiclesByIds(usedVehicleIDs);
         double summedVehicleSize = sumAttribute(vehicles, Vehicle::getSize);
         double summedVehicleMaxWeight = sumAttribute(vehicles, Vehicle::getMaxWeight);
 
-        Order order = orderService.getOrderById(transportOperationDTO.getOrderID());
-        List<Good> orderedGoods = order.getGoods();
-        double summedOrderedGoodsSize = sumAttribute(orderedGoods, Good::getSize);
-        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, Good::getWeight);
+        Order order = orderService.getOrderById(transportOperationDTO.getOrderDTO().getId());
+        List<OrderedGood> orderedGoods = order.getGoods();
+        double summedOrderedGoodsSize = sumAttribute(orderedGoods, og -> og.getGood().getSize());
+        double summedOrderedGoodsWeight = sumAttribute(orderedGoods, og -> og.getGood().getWeight());
 
         return (summedOrderedGoodsSize <= summedVehicleSize) && (summedOrderedGoodsWeight <= summedVehicleMaxWeight);
     }
@@ -71,18 +81,18 @@ public class TransportOperationService {
                 .sum();
     }
 
-    private boolean checkGoodsAvailable(TransportOperationDTO transportOperationDTO) {
-        var order = orderService.getOrderById(transportOperationDTO.getOrderID());
-        var vehicles = vehicleService.getVehiclesByIds(transportOperationDTO.getUsedVehicleIDs());
+    private boolean checkGoodsAvailable(List<Long> usedVehicleIDs, TransportOperationDTO transportOperationDTO) {
+        var order = orderService.getOrderById(transportOperationDTO.getOrderDTO().getId());
+        var vehicles = vehicleService.getVehiclesByIds(usedVehicleIDs);
         var lorrySites = new ArrayList<LorrySite>();
         vehicles.forEach(v -> lorrySites.add(v.getLocation()));
-        var lorrySiteGoods = new ArrayList<Good>();
+        var lorrySiteGoods = new ArrayList<InventoryGood>();
         lorrySites.forEach(l -> lorrySiteGoods.addAll(l.getGoods()));
         var summedGoods = lorrySiteService.aggregateGoods(lorrySiteGoods, true);
         var orderedGoods = order.getGoods();
         AtomicBoolean res = new AtomicBoolean(true);
         orderedGoods.forEach(og -> summedGoods.forEach(g -> {
-            if(Objects.equals(og.getName(), g.getName()) && Objects.equals(og.getSize(), g.getSize()) && Objects.equals(og.getWeight(), g.getWeight())
+            if(Objects.equals(og.getGood().getName(), g.getGood().getName()) && Objects.equals(og.getGood().getSize(), g.getGood().getSize()) && Objects.equals(og.getGood().getWeight(), g.getGood().getWeight())
                     && og.getQuantity() > g.getQuantity()){
                 res.set(false);
             }
@@ -121,8 +131,14 @@ public class TransportOperationService {
         if (existingTransportOperation.isPresent()) {
             TransportOperation updatedTransportOperation = convertToEntity(updatedTransportOperationDTO);
             updatedTransportOperation.setId(id);
-            updatedTransportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(updatedTransportOperationDTO.getUsedVehicleIDs()));
-            updatedTransportOperation.setOrder(orderService.getOrderById(updatedTransportOperationDTO.getOrderID()));
+
+            List<Long> usedVehicleIDs = new ArrayList<>();
+            for (var uv : updatedTransportOperationDTO.getUsedVehicleDTOs()){
+                usedVehicleIDs.add(uv.getId());
+            }
+            updatedTransportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(usedVehicleIDs));
+
+            updatedTransportOperation.setOrder(orderService.getOrderById(updatedTransportOperationDTO.getOrderDTO().getId()));
 
             TransportOperation savedTransportOperation = transportOperationRepository.save(updatedTransportOperation);
             return convertToDTO(savedTransportOperation);
@@ -137,15 +153,26 @@ public class TransportOperationService {
             var realTO = tO.get();
             var lSId = realTO.getUsedVehicles().get(1).getLocation().getId();
             assert realTO.getOrder() != null;
-            for(Good g : realTO.getOrder().getGoods()){
-                lorrySiteService.addGood(lSId, g);
+            for(OrderedGood g : realTO.getOrder().getGoods()){
+                lorrySiteService.addGood(lSId, convertToStackedGoodDTO(g));
             }
         }
         transportOperationRepository.deleteById(id);
     }
 
+    private StackedGoodDTO convertToStackedGoodDTO(OrderedGood g) {
+        StackedGoodDTO sgDTO = new StackedGoodDTO();
+        sgDTO.setGoodId(g.getGood().getId());
+        sgDTO.setQuantity(g.getQuantity());
+        return sgDTO;
+    }
+
     private TransportOperationDTO convertToDTO(TransportOperation transportOperation) {
-        return modelMapper.map(transportOperation, TransportOperationDTO.class);
+        TransportOperationDTO toDTO = modelMapper.map(transportOperation, TransportOperationDTO.class);
+        if(transportOperation.getOrder() != null){
+            toDTO.setOrderDTO(orderService.getOrderDTOById(transportOperation.getOrder().getId()));
+        }
+        return toDTO;
     }
 
     private TransportOperation convertToEntity(TransportOperationDTO transportOperationDTO) {

@@ -18,9 +18,9 @@ public class GoodController {
     @Autowired
     private GoodService goodService;
 
-    @PostMapping("/{lorrySiteId}")
-    public ResponseEntity<GoodDTO> createGood(@PathVariable Long lorrySiteId, @Validated @RequestBody GoodDTO goodDTO) {
-        GoodDTO createdGood = goodService.createGood(lorrySiteId, goodDTO);
+    @PostMapping
+    public ResponseEntity<GoodDTO> createGood(@Validated @RequestBody GoodDTO goodDTO) {
+        GoodDTO createdGood = goodService.createGood(goodDTO);
         return new ResponseEntity<>(createdGood, HttpStatus.CREATED);
     }
 

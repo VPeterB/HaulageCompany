@@ -84,4 +84,17 @@ public class VehicleService {
     public List<Vehicle> getVehiclesByIds(List<Long> usedVehicleIDs) {
         return StreamSupport.stream(vehicleRepository.findAllById(usedVehicleIDs).spliterator(), false).toList();
     }
+
+    public void addTransportOperation(List<Vehicle> vehicles, TransportOperation createdTransportOperation) {
+        for(Vehicle v : vehicles){
+            Optional<Vehicle> currVehicle = vehicleRepository.findById(v.getId());
+            if(currVehicle.isPresent()){
+                Vehicle realV = currVehicle.get();
+                List<TransportOperation> tOList = realV.getTransportOperations();
+                tOList.add(createdTransportOperation);
+                realV.setTransportOperations(tOList);
+                vehicleRepository.save(realV);
+            }
+        }
+    }
 }
