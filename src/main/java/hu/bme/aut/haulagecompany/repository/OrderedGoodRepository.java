@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderedGoodRepository extends CrudRepository<OrderedGood, Long> {
+    void deleteAllByGoodId(Long goodId);
 }

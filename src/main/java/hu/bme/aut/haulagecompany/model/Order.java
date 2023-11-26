@@ -19,7 +19,7 @@ public class Order {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private List<OrderedGood> goods;
 

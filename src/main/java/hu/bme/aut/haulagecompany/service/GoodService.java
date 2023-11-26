@@ -1,8 +1,11 @@
 package hu.bme.aut.haulagecompany.service;
 
-import hu.bme.aut.haulagecompany.model.Good;
+import hu.bme.aut.haulagecompany.model.*;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.repository.GoodRepository;
+import hu.bme.aut.haulagecompany.repository.InventoryGoodRepository;
+import hu.bme.aut.haulagecompany.repository.OrderedGoodRepository;
+import hu.bme.aut.haulagecompany.repository.StackedGoodRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +17,20 @@ import java.util.stream.StreamSupport;
 public class GoodService {
     private final GoodRepository goodRepository;
     private final ModelMapper modelMapper;
+    private final OrderedGoodRepository orderedGoodRepository;
+    private final InventoryGoodRepository inventoryGoodRepository;
+    private final StackedGoodRepository stackedGoodRepository;
 
     @Autowired
-    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper) {
+    public GoodService(GoodRepository goodRepository, ModelMapper modelMapper,
+                       OrderedGoodRepository orderedGoodRepository,
+                       InventoryGoodRepository inventoryGoodRepository,
+                       StackedGoodRepository stackedGoodRepository) {
         this.goodRepository = goodRepository;
         this.modelMapper = modelMapper;
+        this.orderedGoodRepository = orderedGoodRepository;
+        this.inventoryGoodRepository = inventoryGoodRepository;
+        this.stackedGoodRepository = stackedGoodRepository;
     }
 
     public GoodDTO createGood(GoodDTO goodDTO) {
@@ -42,9 +54,16 @@ public class GoodService {
         Optional<Good> existingGood = goodRepository.findById(id);
 
         if (existingGood.isPresent()) {
-            Good updatedGood = convertToEntity(updatedGoodDTO);
-            updatedGood.setId(id);
-
+            List<StackedGood> sg = stackedGoodRepository.findAllByGoodId(id);
+            if(sg.isEmpty()){
+                Good updatedGood = convertToEntity(updatedGoodDTO);
+                updatedGood.setId(id);
+                Good savedGood = goodRepository.save(updatedGood);
+                return convertToDTO(savedGood);
+            }
+            Good updatedGood = existingGood.get();
+            updatedGood.setName(updatedGoodDTO.getName());
+            updatedGood.setDescription(updatedGoodDTO.getDescription());
             Good savedGood = goodRepository.save(updatedGood);
             return convertToDTO(savedGood);
         } else {
@@ -53,6 +72,14 @@ public class GoodService {
     }
 
     public void deleteGood(Long id) {
+        Optional<Good> g = goodRepository.findById(id);
+        if(g.isPresent()){
+            List<StackedGood> sg = stackedGoodRepository.findAllByGoodId(id);
+            for(StackedGood stackedGood : sg){
+                stackedGood.setGood(null);
+                stackedGoodRepository.save(stackedGood);
+            }
+        }
         goodRepository.deleteById(id);
     }
 
@@ -67,16 +94,6 @@ public class GoodService {
         return modelMapper.map(goodDTO, Good.class);
     }
 
-    public List<Good> getGoodsByIds(List<Long> goodIDs) {
-        List<Optional<Good>> goodList = goodIDs.stream()
-                .map(goodRepository::findById)
-                .toList();
-        List<Good> realGoodList = new ArrayList<>();
-        for(Optional<Good> og : goodList){
-            og.ifPresent(realGoodList::add);
-        }
-        return realGoodList;
-    }
 
     public Optional<Good> findById(Long goodId) {
         return goodRepository.findById(goodId);

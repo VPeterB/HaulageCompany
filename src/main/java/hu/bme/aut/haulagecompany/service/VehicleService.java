@@ -1,8 +1,13 @@
 package hu.bme.aut.haulagecompany.service;
 
+import hu.bme.aut.haulagecompany.model.Order;
+import hu.bme.aut.haulagecompany.model.OrderedGood;
 import hu.bme.aut.haulagecompany.model.TransportOperation;
+import hu.bme.aut.haulagecompany.model.dto.StackedGoodDTO;
 import hu.bme.aut.haulagecompany.model.dto.VehicleDTO;
 import hu.bme.aut.haulagecompany.model.Vehicle;
+import hu.bme.aut.haulagecompany.repository.OrderRepository;
+import hu.bme.aut.haulagecompany.repository.TransportOperationRepository;
 import hu.bme.aut.haulagecompany.repository.VehicleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +21,16 @@ import java.util.stream.StreamSupport;
 @Service
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
+    private final TransportOperationRepository transportOperationRepository;
+    private final OrderRepository orderRepository;
     private final LorrySiteService lorrySiteService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, LorrySiteService lorrySiteService, ModelMapper modelMapper) {
+    public VehicleService(VehicleRepository vehicleRepository, TransportOperationRepository transportOperationRepository, OrderRepository orderRepository, LorrySiteService lorrySiteService, ModelMapper modelMapper) {
         this.vehicleRepository = vehicleRepository;
+        this.transportOperationRepository = transportOperationRepository;
+        this.orderRepository = orderRepository;
         this.lorrySiteService = lorrySiteService;
         this.modelMapper = modelMapper;
     }
@@ -59,14 +68,49 @@ public class VehicleService {
         if (existingVehicle.isPresent()) {
             Vehicle updatedVehicle = existingVehicle.get();
             updatedVehicle.setLicensePlate(updatedVehicleDTO.getLicensePlate());
-            updatedVehicle.setSize(updatedVehicleDTO.getSize());
-            updatedVehicle.setMaxWeight(updatedVehicleDTO.getMaxWeight());
+            if(updatedVehicle.getTransportOperations().isEmpty()){
+                updatedVehicle.setSize(updatedVehicleDTO.getSize());
+                updatedVehicle.setMaxWeight(updatedVehicleDTO.getMaxWeight());
+            }
             updatedVehicle.setLocation(lorrySiteService.findById(updatedVehicleDTO.getLorrySiteID()).orElse(existingVehicle.get().getLocation()));
             Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
+            /*for(TransportOperation to: savedVehicle.getTransportOperations()){ //concurent mod error
+                if(to != null){
+                    var lSId = to.getUsedVehicles().get(0).getLocation().getId();
+                    if(to.getOrder() != null){
+                        for(OrderedGood g : to.getOrder().getGoods()){
+                            lorrySiteService.addGood(lSId, convertToStackedGoodDTO(g));
+                        }
+                        Order o = to.getOrder();
+                        if(o != null){
+                            Optional<Order> order = orderRepository.findById(o.getId());
+                            if(order.isPresent()){
+                                Order realO = order.get();
+                                realO.setTransportOperation(null);
+                                orderRepository.save(realO);
+                            }
+                        }
+                    }
+                    List<Vehicle> vl = to.getUsedVehicles();
+                    for(var v : vl){
+                        var tooo = transportOperationRepository.findById(to.getId());
+                        removeTransportOperation(v, tooo);
+                    }
+                    to.setUsedVehicles(null);
+                }
+                transportOperationRepository.deleteById(id);
+            }*/
             return convertToDTO(savedVehicle);
         } else {
             return null;
         }
+    }
+
+    private StackedGoodDTO convertToStackedGoodDTO(OrderedGood g) {
+        StackedGoodDTO sgDTO = new StackedGoodDTO();
+        sgDTO.setGoodId(g.getGood().getId());
+        sgDTO.setQuantity(g.getQuantity());
+        return sgDTO;
     }
 
     public void deleteVehicle(Long id) {

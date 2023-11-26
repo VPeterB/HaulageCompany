@@ -70,8 +70,23 @@ public class LorrySiteService {
         }
     }
 
-    public void deleteLocation(Long id) {
+    public boolean deleteLocation(Long id) {
+        Optional<LorrySite> l = lorrySiteRepository.findById(id);
+        if(l.isPresent()){
+            LorrySite lorrySite = l.get();
+            if(!lorrySite.getVehicles().isEmpty()){
+                return false;
+            }
+            List<InventoryGood> lGoods = lorrySite.getGoods();
+            for(InventoryGood g : lGoods){
+                g.setLorrySite(null);
+                inventoryGoodRepository.save(g);
+            }
+            lorrySite.setGoods(new ArrayList<>());
+            lorrySiteRepository.save(lorrySite);
+        }
         lorrySiteRepository.deleteById(id);
+        return true;
     }
 
     private LorrySiteDTO convertToDTO(LorrySite lorrySite) {
