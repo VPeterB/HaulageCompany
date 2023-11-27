@@ -47,8 +47,16 @@ public class TransportOperationService {
             usedVehicleIDs.add(uv.getId());
         }
 
-        if(!checkVehicleAvailable(transportOperationDTO.getDate(), usedVehicleIDs) || !checkGoodsAvailable(usedVehicleIDs, transportOperationDTO) || !checkVehicleSizesAreGood(usedVehicleIDs, transportOperationDTO)){
+        if(!checkVehicleAvailable(transportOperationDTO.getDate(), usedVehicleIDs)){
             return null;
+        }
+        if(!checkGoodsAvailable(usedVehicleIDs, transportOperationDTO)){
+            return new TransportOperationDTO();
+        }
+        if(!checkVehicleSizesAreGood(usedVehicleIDs, transportOperationDTO)){
+            var d = new TransportOperationDTO();
+            d.setId(-1L);
+            return d;
         }
 
         transportOperation.setUsedVehicles(vehicleService.getVehiclesByIds(usedVehicleIDs));
@@ -92,6 +100,13 @@ public class TransportOperationService {
         lorrySites.forEach(l -> lorrySiteGoods.addAll(l.getGoods()));
         List<OrderedGood> orderedGoods = order.getGoods();
         AtomicBoolean res = new AtomicBoolean(true);
+        orderedGoods.forEach(og -> {
+            if(lorrySiteGoods.stream().noneMatch(g -> Objects.equals(og.getGood().getName(), g.getGood().getName())
+                    && Objects.equals(og.getGood().getSize(), g.getGood().getSize())
+                    && Objects.equals(og.getGood().getWeight(), g.getGood().getWeight()))){
+                res.set(false);
+            }
+        });
         orderedGoods.forEach(og -> lorrySiteGoods.forEach(g -> {
             if(Objects.equals(og.getGood().getName(), g.getGood().getName()) && Objects.equals(og.getGood().getSize(), g.getGood().getSize()) && Objects.equals(og.getGood().getWeight(), g.getGood().getWeight())
                     && og.getQuantity() > g.getQuantity()){

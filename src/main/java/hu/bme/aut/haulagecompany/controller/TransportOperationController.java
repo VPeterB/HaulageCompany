@@ -16,10 +16,16 @@ public class TransportOperationController {
     private TransportOperationService transportOperationService;
 
     @PostMapping
-    public ResponseEntity<TransportOperationDTO> createTransportOperation(@RequestBody TransportOperationDTO transportOperationDTO) {
+    public ResponseEntity<?> createTransportOperation(@RequestBody TransportOperationDTO transportOperationDTO) {
         TransportOperationDTO createdTransportOperation = transportOperationService.createTransportOperation(transportOperationDTO);
         if(createdTransportOperation == null){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Vehicle(s) not available!", HttpStatus.CONFLICT);
+        }
+        if(createdTransportOperation.getId() == null){
+            return new ResponseEntity<>("Good(s) not available!", HttpStatus.CONFLICT);
+        }
+        if(createdTransportOperation.getId() == -1L){
+            return new ResponseEntity<>("Vehicle(s) size not enough!", HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(createdTransportOperation, HttpStatus.CREATED);
     }
