@@ -3,8 +3,6 @@ package hu.bme.aut.haulagecompany.service;
 import hu.bme.aut.haulagecompany.model.*;
 import hu.bme.aut.haulagecompany.model.dto.GoodDTO;
 import hu.bme.aut.haulagecompany.repository.GoodRepository;
-import hu.bme.aut.haulagecompany.repository.InventoryGoodRepository;
-import hu.bme.aut.haulagecompany.repository.OrderedGoodRepository;
 import hu.bme.aut.haulagecompany.repository.StackedGoodRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +15,13 @@ import java.util.stream.StreamSupport;
 public class GoodService {
     private final GoodRepository goodRepository;
     private final ModelMapper modelMapper;
-    private final OrderedGoodRepository orderedGoodRepository;
-    private final InventoryGoodRepository inventoryGoodRepository;
     private final StackedGoodRepository stackedGoodRepository;
 
     @Autowired
     public GoodService(GoodRepository goodRepository, ModelMapper modelMapper,
-                       OrderedGoodRepository orderedGoodRepository,
-                       InventoryGoodRepository inventoryGoodRepository,
                        StackedGoodRepository stackedGoodRepository) {
         this.goodRepository = goodRepository;
         this.modelMapper = modelMapper;
-        this.orderedGoodRepository = orderedGoodRepository;
-        this.inventoryGoodRepository = inventoryGoodRepository;
         this.stackedGoodRepository = stackedGoodRepository;
     }
 

@@ -12,8 +12,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vehicles")
 public class VehicleController {
+
+    private final VehicleService vehicleService;
+
     @Autowired
-    private VehicleService vehicleService;
+    public VehicleController(VehicleService vehicleService){
+        this.vehicleService = vehicleService;
+    }
 
     @PostMapping
     public ResponseEntity<VehicleDTO> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
