@@ -78,12 +78,14 @@ public class LorrySiteService {
                 return false;
             }
             List<InventoryGood> lGoods = lorrySite.getGoods();
+            List<InventoryGood> lGoodsToRemove = new ArrayList<>();
             for(InventoryGood g : lGoods){
                 g.setLorrySite(null);
-                inventoryGoodRepository.save(g);
+                lGoodsToRemove.add(inventoryGoodRepository.save(g));
             }
             lorrySite.setGoods(new ArrayList<>());
             lorrySiteRepository.save(lorrySite);
+            inventoryGoodRepository.deleteAll(lGoodsToRemove);
         }
         lorrySiteRepository.deleteById(id);
         return true;
