@@ -49,8 +49,11 @@ public class LorrySiteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
-        lorrySiteService.deleteLocation(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        boolean success = lorrySiteService.deleteLocation(id);
+        if(success){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @PutMapping("/{id}/addGood")
